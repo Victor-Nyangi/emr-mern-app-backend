@@ -1,5 +1,5 @@
 const express = require("express");
-
+const path = require('path');
 const app = express();
 const connectDB = require('./config/db');
 var cors = require('cors');
@@ -49,19 +49,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Serve frontend
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')))
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../frontend/build')))
 
-  app.get('*', (req, res) =>
-    res.sendFile(
-      path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
-    )
-  )
-} else {
+//   app.get('*', (req, res) =>
+//     res.sendFile(
+//       path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
+//     )
+//   )
+// } else {
   app.get("/", (req, res) => {
       res.json({ info: "Node.js, Express, and MongoDB API" });
     });
-}
+// }
 
 app.use('/api/v1/services', v1ServiceRoutes)
 app.use('/api/v1/departments', v1DepartmentRoutes)
