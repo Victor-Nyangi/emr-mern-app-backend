@@ -15,7 +15,6 @@ const v1FinancialRoutes = require('./routes/api/financial_api')
 const v1AuthRoutes = require('./routes/api/auth_api')
 
 
-
 // patient_name,
 // doctor_name,
 // lab_information,
