@@ -14,17 +14,23 @@
     "author": "Nyangi Victor",
     "license": "ISC",
     "dependencies": {
+        "aws-sdk": "^2.1156.0",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.2",
         "config": "^3.3.7",
         "cors": "^2.8.5",
         "express": "^4.17.3",
         "express-async-handler": "^1.2.0",
+        "gmail-send": "^1.8.14",
+        "joi": "^17.6.0",
         "jsonwebtoken": "^8.5.1",
+        "log4js": "^6.5.2",
         "mongoose": "^6.2.4",
-        "pg": "^8.7.1"
+        "pdfkit": "^0.13.0",
+        "pg": "^8.7.1",
+        "shortid": "^2.2.16"
     },
     "devDependencies": {
-        "nodemon": "^2.0.15"
+        "nodemon": "^2.0.16"
     }
 }

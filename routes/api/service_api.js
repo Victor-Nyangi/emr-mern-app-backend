@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Service = require('../../controllers/service');
+const handleCreateInvoice = require('../../controllers/handleCreateInvoice');
 
 // Retrieve all members
 router.get('/', Service.getAll);
@@ -16,5 +17,8 @@ router.patch('/:id', Service.update);
 
 // Delete a member with id
 router.delete('/:id', Service.delete);
-  
-module.exports = router  
+
+// invoice items
+router.post('/', handleCreateInvoice);
+
+module.exports = router
