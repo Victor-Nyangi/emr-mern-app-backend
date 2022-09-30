@@ -19,6 +19,6 @@ router.patch('/:id', Service.update);
 router.delete('/:id', Service.delete);
 
 // invoice items
-router.post('/', handleCreateInvoice);
+router.post('/invoice', handleCreateInvoice.createInvoice);
 
 module.exports = router

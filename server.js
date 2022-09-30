@@ -13,6 +13,7 @@ const v1BillingRoutes = require('./routes/api/billing_api')
 const v1VitalRoutes = require('./routes/api/vital_api')
 const v1FinancialRoutes = require('./routes/api/financial_api')
 const v1AuthRoutes = require('./routes/api/auth_api')
+const v1messageRoutes = require('./routes/api/message_api')
 
 
 // patient_name,
@@ -72,6 +73,7 @@ app.use('/api/v1/billings', v1BillingRoutes)
 app.use('/api/v1/vitals', v1VitalRoutes)
 app.use('/api/v1/financials', v1FinancialRoutes)
 app.use('/api/v1/users', v1AuthRoutes)
+app.use('/api/v1/sms', v1messageRoutes)
 
 
 const port = process.env.PORT || 5000;

@@ -6,7 +6,7 @@ const { generateInvoicePdf } = require("../utils/pdf-generator");
 const { sendGmail } = require("../utils/email-sender");
 const { getClientById } = require("../repositories/clients");
 
-const Log4js = require("log4js");
+const log4js = require("log4js");
 log4js.configure({
   appenders: {
     invoiceStory: {
@@ -18,9 +18,9 @@ log4js.configure({
 });
 
 const logger = log4js.getLogger("invoiceStory");
-Logger.level = "debug";
+logger.level = "debug";
 
-const handleCreateInvoice = async (req, res, next) => {
+exports.createInvoice = async (req, res, next) => {
   try {
     await createInvoiceSchema.validateAsync(req.body);
 
@@ -68,4 +68,4 @@ const handleCreateInvoice = async (req, res, next) => {
     return res.status(400).send({ message: err.message });
   }
 };
-module.exports = { handleCreateInvoice };
+// module.exports = { handleCreateInvoice };
