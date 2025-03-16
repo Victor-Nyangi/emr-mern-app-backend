@@ -1,18 +1,21 @@
 {
-    "name": "backend",
-    "version": "1.0.0",
-    "description": "A simple crud app using expressjs and mysql",
+    "name": "emr-backend",
+    "version": "2.0.0",
+    "description": "A simple crud backend built using expressjs and mysql",
     "main": "server.js",
     "engines": {
-        "node": "14.x",
-        "npm": "6.14.14"
+        "node": ">=20",
+        "npm": "11.2.0"
     },
     "scripts": {
+        "dev": "ts-node-dev src/index.ts",
+        "build": "tsc",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "nodemon server"
+        "start": "node dist/index.js"
     },
     "author": "Nyangi Victor",
     "license": "ISC",
+    "homepage": "#readme",
     "dependencies": {
         "africastalking": "^0.5.5",
         "aws-sdk": "^2.1156.0",
@@ -20,19 +23,29 @@
         "body-parser": "^1.19.2",
         "config": "^3.3.7",
         "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
         "express": "^4.17.3",
         "express-async-handler": "^1.2.0",
         "gmail-send": "^1.8.14",
         "joi": "^17.6.0",
         "jsonwebtoken": "^8.5.1",
         "log4js": "^6.5.2",
+        "mongodb": "^6.14.2",
         "mongoose": "^6.2.4",
         "pdfkit": "^0.13.0",
         "pg": "^8.7.1",
         "shortid": "^2.2.16",
-        "socket.io": "^4.5.3"
+        "socket.io": "^4.5.3",
+        "ts-node-dev": "^2.0.0"
     },
     "devDependencies": {
-        "nodemon": "^2.0.22"
+        "@types/bcryptjs": "^2.4.6",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.0",
+        "@types/jsonwebtoken": "^9.0.9",
+        "@types/node": "^22.13.10",
+        "nodemon": "^2.0.22",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.2"
     }
 }
