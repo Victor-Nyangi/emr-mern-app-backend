@@ -1,12 +1,18 @@
 "use strict";
-const shortId = require("shortid");
-const path = require("path");
-const { createInvoiceSchema } = require("../schemas/invoice");
-const { generateInvoicePdf } = require("../utils/pdf-generator");
-const { sendGmail } = require("../utils/email-sender");
+import path from "path";
+import log4js from "log4js";
+import shortId from "shortid";
+import { Request, Response } from "express";
+
+import createInvoiceSchema from "../schemas/invoice";
+import generateInvoicePdf from "../utils/pdf-generator";
+
 const { getClientById } = require("../repositories/clients");
 
-const log4js = require("log4js");
+type BillItem = {
+  amountSum: number;
+  quantity: number;
+};
 log4js.configure({
   appenders: {
     invoiceStory: {
@@ -20,7 +26,10 @@ log4js.configure({
 const logger = log4js.getLogger("invoiceStory");
 logger.level = "debug";
 
-exports.createInvoice = async (req, res, next) => {
+export const createInvoice = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     await createInvoiceSchema.validateAsync(req.body);
 
@@ -37,12 +46,12 @@ exports.createInvoice = async (req, res, next) => {
     const invoiceNumber = "FACT-" + invoiceId + "." + clientId;
 
     // Calculate sum per item
-    items.forEach((item) => {
-      item.amountsum = pricePerSession * item.quantity;
+    items.forEach((item: BillItem) => {
+      item.amountSum = pricePerSession * item.quantity;
       return item;
     });
     // getting subtotal ->
-    const subtotal = items.reduce((prev, curr) => {
+    const subtotal = items.reduce((prev: number, curr: BillItem) => {
       return curr.amountSum + prev;
     }, 0);
 
@@ -53,19 +62,23 @@ exports.createInvoice = async (req, res, next) => {
     logger.info("The data:", invoiceDetails);
     if (debugMode) {
       logger.debug("It is a debug mode, returning the data");
-      return res.send({
+      res.send({
         success: false,
         debugMode,
-        data: { invoiceDetails, filepath },
+        data: { invoiceDetails, filePath },
       });
     }
     logger.info("It is NOT a debug mode, going to send the email");
-    generateInvoicePdf(invoiceDetails, filePath);
+    generateInvoicePdf(invoiceNumber, filePath);
     // ... Other stuff happening here ( incl sending email)
-    return res.send({ success: true, data: { destinationEmail } });
-  } catch (err) {
-    Logger.error("Some error occured", { message: err.message });
-    return res.status(400).send({ message: err.message });
+    res.send({ success: true, data: { destinationEmail } });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
+    logger.error("Some error occured", { message });
+    res.status(400).json({ message });
   }
 };
 // module.exports = { handleCreateInvoice };
+
+export default createInvoice;

@@ -1,6 +1,6 @@
+import createInvoice from "../../controllers/invoiceController";
 import { create, single, deleteService, getAll, update } from "../../controllers/serviceController";
 import { Router } from "express";
-// const handleCreateInvoice = require('../../controllers/handleCreateInvoice');
 
 const router = Router();
 
@@ -20,6 +20,6 @@ router.patch('/:id', update);
 router.delete('/:id', deleteService);
 
 // invoice items
-// router.post('/invoice', handleCreateInvoice.createInvoice);
+router.post('/invoice', createInvoice);
 
 export default router;
