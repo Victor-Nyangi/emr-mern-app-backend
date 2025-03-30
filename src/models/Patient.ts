@@ -15,7 +15,7 @@ const patientSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        requried: true
+        requried: false
     },
     phone_number : {
         type: Number,
@@ -39,23 +39,23 @@ const patientSchema = new mongoose.Schema({
     },
     marital_status: {
         type: String,
-        required: true
+        required: false
     },
     education_level: {
         type: String,
-        required: true
+        required: false
     },
     income_level: {
         type: String,
-        required: true
+        required: false
     },
     occupation: {
         type: String,
-        required: true
+        required: false
     },
     size_of_family: {
         type: Number,
-        required: true
+        required: false
     },
     emergency_contact: {
         type: String,
@@ -71,7 +71,7 @@ const patientSchema = new mongoose.Schema({
     },
     underlying_conditions: {
         type: [String],
-        required: true
+        required: false
     },
     is_active : {
         type: Boolean,
