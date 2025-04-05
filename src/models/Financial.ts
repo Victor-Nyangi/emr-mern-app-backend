@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 
+/** A patient's payment details */
 const financialSchema = new mongoose.Schema({
   patient_name: {
     type: String,

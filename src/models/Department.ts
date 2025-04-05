@@ -5,6 +5,10 @@ const departmentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    enum: ['Triage', 'Lab', 'Radiology', 'Pharmacy', 'Consultation'],
+  },
   description: {
     type: String,
     required: true,

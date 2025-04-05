@@ -9,16 +9,15 @@ import v1DrugRoutes from "./routes/api/drug-api";
 import v1MemberRoutes from "./routes/api/member-api";
 import v1PatientRoutes from "./routes/api/patient-api";
 import v1FinancialRoutes from "./routes/api/financial-api";
+import v1QueueRoutes from "./routes/api/queue-api";
 import v1messageRoutes from "./routes/api/engagement-api";
 import homeRoutes from "./routes/home";
-
 
 // patient_name,
 // doctor_name,
 // lab_information,
 // diagnosis,
 // date_created
-
 
 // Lab tests
 
@@ -33,15 +32,14 @@ import homeRoutes from "./routes/home";
 const app = createApp();
 
 app.use("/api/v1", homeRoutes);
-app.use('/api/v1/services', v1ServiceRoutes)
-app.use('/api/v1/departments', v1DepartmentRoutes)
-app.use('/api/v1/billings', v1BillingRoutes)
-app.use('/api/v1/vitals', v1VitalRoutes)
-app.use('/api/v1/auth', v1AuthRoutes)
-app.use('/api/v1/drugs', v1DrugRoutes)
-app.use('/api/v1/members', v1MemberRoutes)
-app.use('/api/v1/patients', v1PatientRoutes)
-app.use('/api/v1/financials', v1FinancialRoutes)
-app.use('/api/v1/sms', v1messageRoutes)
-
-
+app.use("/api/v1/services", v1ServiceRoutes);
+app.use("/api/v1/departments", v1DepartmentRoutes);
+app.use("/api/v1/billings", v1BillingRoutes);
+app.use("/api/v1/vitals", v1VitalRoutes);
+app.use("/api/v1/auth", v1AuthRoutes);
+app.use("/api/v1/drugs", v1DrugRoutes);
+app.use("/api/v1/members", v1MemberRoutes);
+app.use("/api/v1/queues", v1QueueRoutes);
+app.use("/api/v1/patients", v1PatientRoutes);
+app.use("/api/v1/financials", v1FinancialRoutes);
+app.use("/api/v1/sms", v1messageRoutes);

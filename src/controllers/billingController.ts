@@ -34,18 +34,24 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 export const create = async (req: Request, res: Response): Promise<void> => {
   const {
     patient_name,
+    visit_id,
     service_charged,
     explanation,
     amount,
+    insuranceProvider,
+    notes,
     date_created,
     updated_date,
   } = req.body;
   try {
     const newBilling = new Billing({
       patient_name,
+      visit_id,
       service_charged,
       explanation,
       amount,
+      insuranceProvider,
+      notes,
       date_created,
       updated_date,
     });
@@ -68,8 +74,11 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       patient_name,
       service_charged,
       explanation,
+      amountPaid,
+      insuranceProvider,
       amount,
       date_created,
+      notes,
       updated_date,
     } = req.body;
 
@@ -82,9 +91,11 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const payload = {
       patient_name,
       service_charged,
-      explanation,
+      amountPaid,
+      insuranceProvider,
       amount,
       date_created,
+      notes,
       updated_date,
       _id: id,
     };
