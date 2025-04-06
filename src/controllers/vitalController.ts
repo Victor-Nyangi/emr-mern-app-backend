@@ -33,7 +33,7 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 
 export const create = async (req: Request, res: Response) => {
   const {
-    patient_name,
+    patient_id,
     body_temperature,
     pulse_rate,
     respiration_rate,
@@ -43,12 +43,11 @@ export const create = async (req: Request, res: Response) => {
     weight,
     blood_glucose,
     health_status,
-    updated_date,
   } = req.body;
 
   try {
     const newVital = new Vital({
-      patient_name,
+      patient_id,
       body_temperature,
       pulse_rate,
       respiration_rate,
@@ -58,7 +57,6 @@ export const create = async (req: Request, res: Response) => {
       weight,
       blood_glucose,
       health_status,
-      updated_date,
     });
 
     const savedVital = await newVital.save();
@@ -75,7 +73,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({ message: "Invalid ID" });
 
     const {
-      patient_name,
+      patient_id,
       body_temperature,
       pulse_rate,
       respiration_rate,
@@ -85,7 +83,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       weight,
       blood_glucose,
       health_status,
-      updated_date,
     } = req.body;
 
     if (!req.body) {
@@ -98,7 +95,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       res.status(404).send(`No vital with id: ${id}`);
 
     const payload = {
-      patient_name,
+      patient_id,
       body_temperature,
       pulse_rate,
       respiration_rate,
@@ -108,7 +105,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       weight,
       blood_glucose,
       health_status,
-      updated_date,
       _id: id,
     };
 

@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 /** A patient's invoice details */
 const billingSchema = new mongoose.Schema({
@@ -7,7 +7,8 @@ const billingSchema = new mongoose.Schema({
     required: true,
   },
   visit_id: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Visit",
     required: true,
   },
   amountPaid: {
@@ -18,13 +19,13 @@ const billingSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  service_charged: {
-    type: String,
-    required: true,
+  services_charged: {
+    type: [String],
+    required: false,
   },
-  explanation: {
+  diagnosis: {
     type: String,
-    required: true,
+    required: false,
   },
   amount: {
     type: Number,
@@ -35,7 +36,6 @@ const billingSchema = new mongoose.Schema({
     default: Date.now,
   },
   notes: String,
-
 });
 
 const Billing = mongoose.model("Billing", billingSchema);

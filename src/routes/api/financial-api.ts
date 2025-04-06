@@ -9,19 +9,19 @@ import {
 
 
 const router = Router();
-// Retrieve all members
+// Retrieve all financials
 router.get('/', getAll);
 
-// Create a new member
+// Create a new financial
 router.post('/', create);
 
-// Retrieve a single member with id
+// Retrieve a single financial with id
 router.get('/:id', single);
 
-// Update a member with id
+// Update a financial with id
 router.patch('/:id', update);
 
-// Delete a member with id
+// Delete a financial with id
 router.delete('/:id', deleteFinancial);
 
 export default router;  

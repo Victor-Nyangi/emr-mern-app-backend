@@ -31,7 +31,7 @@ export const single = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Create a member
+// Create a drug
 export const create = async (req: Request, res: Response): Promise<void> => {
   const { name, description, manufacter_date, expiry_date, updated_date } =
     req.body;

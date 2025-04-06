@@ -31,10 +31,10 @@ export const single = async (req: Request, res: Response): Promise<void> => {
   }
 };
 export const create = async (req: Request, res: Response): Promise<void> => {
-  const { name, description, updated_date } = req.body;
+  const { name, type, description, updated_date } = req.body;
 
   try {
-    const newDepartment = new Department({ name, description, updated_date });
+    const newDepartment = new Department({ name, type, description, updated_date });
 
     const savedDepartment = await newDepartment.save();
 
@@ -50,7 +50,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const { name, description, updated_date } = req.body;
+    const { name, type, description, updated_date } = req.body;
 
     if (!req.body) {
       res.status(400).send({
@@ -58,7 +58,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       });
     }
 
-    const payload = { name, description, updated_date, _id: id };
+    const payload = { name, type, description, updated_date, _id: id };
 
     const updatedDepartment = await Department.findByIdAndUpdate(id, payload, {
       new: true,

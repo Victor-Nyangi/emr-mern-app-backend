@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import Member from "../models/Member";
+import MedicalProvider from "../models/MedicalProvider";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -10,29 +10,29 @@ const handleError = (res: Response, error: unknown, statusCode = 500) => {
   res.status(statusCode).json({ message });
 };
 
-// Get all members
+// Get all medicalProviders
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const members = await Member.find();
+    const medicalProviders = await MedicalProvider.find();
 
-    res.status(200).json(members);
+    res.status(200).json(medicalProviders);
   } catch (error) {
     handleError(res, error, 404);
   }
 };
 
-// Get a single member
+// Get a single medicalProvider
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const member = await Member.findById(req.params.id);
-    if (!member) res.status(404).json({ message: "Member not found" });
-    res.status(200).json(member);
+    const medicalProvider = await MedicalProvider.findById(req.params.id);
+    if (!medicalProvider) res.status(404).json({ message: "MedicalProvider not found" });
+    res.status(200).json(medicalProvider);
   } catch (error) {
     handleError(res, error, 404);
   }
 };
 
-// Create a member
+// Create a medicalProvider
 export const create = async (req: Request, res: Response): Promise<void> => {
   const {
     first_name,
@@ -50,7 +50,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   } = req.body;
 
   try {
-    const newMember = new Member({
+    const newMedicalProvider = new MedicalProvider({
       first_name,
       last_name,
       date_of_birth,
@@ -65,14 +65,14 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       updated_date,
     });
 
-    const savedMember = await newMember.save();
-    res.status(201).json(savedMember);
+    const savedMedicalProvider = await newMedicalProvider.save();
+    res.status(201).json(savedMedicalProvider);
   } catch (error) {
     handleError(res, error, 400);
   }
 };
 
-// Update member
+// Update medicalProvider
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -117,17 +117,17 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       _id: id,
     };
 
-    const updatedMember = await Member.findByIdAndUpdate(id, payload, {
+    const updatedMedicalProvider = await MedicalProvider.findByIdAndUpdate(id, payload, {
       new: true,
     });
 
-    res.json(updatedMember);
+    res.json(updatedMedicalProvider);
   } catch (error) {
     handleError(res, error, 400);
   }
 };
 
-export const deleteMember = async (
+export const deleteMedicalProvider = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -136,10 +136,10 @@ export const deleteMember = async (
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const deletedMember = await Member.findByIdAndDelete(id);
-    if (!deletedMember) res.status(404).json({ message: "Member not found" });
+    const deletedMedicalProvider = await MedicalProvider.findByIdAndDelete(id);
+    if (!deletedMedicalProvider) res.status(404).json({ message: "MedicalProvider not found" });
 
-    res.json({ message: "Member deleted successfully" });
+    res.json({ message: "MedicalProvider deleted successfully" });
   } catch (error) {
     handleError(res, error, 500);
   }

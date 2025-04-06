@@ -35,8 +35,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   const {
     patient_name,
     visit_id,
-    service_charged,
-    explanation,
+    services_charged,
+    diagnosis,
     amount,
     insuranceProvider,
     notes,
@@ -47,8 +47,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const newBilling = new Billing({
       patient_name,
       visit_id,
-      service_charged,
-      explanation,
+      services_charged,
+      diagnosis,
       amount,
       insuranceProvider,
       notes,
@@ -72,8 +72,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
     const {
       patient_name,
-      service_charged,
-      explanation,
+      services_charged,
+      diagnosis,
       amountPaid,
       insuranceProvider,
       amount,
@@ -90,8 +90,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
     const payload = {
       patient_name,
-      service_charged,
+      services_charged,
       amountPaid,
+      diagnosis,
       insuranceProvider,
       amount,
       date_created,

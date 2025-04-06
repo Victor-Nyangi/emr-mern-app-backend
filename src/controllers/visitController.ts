@@ -35,12 +35,13 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 // Create a visit
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { patient_id, payment_method, queue } = req.body;
+    const { patient_id, payment_method, queueId, isFollowUp } = req.body;
 
     const newVisit = new Visit({
       patient_id,
       payment_method,
-      queue,
+      queueId,
+      isFollowUp,
       status: "ARRIVED",
       createdAt: new Date(),
     });
@@ -61,7 +62,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).send(`No visit with id: ${id}`);
 
-    const { patient_id, payment_method, queue, status } = req.body;
+    const { patient_id, isFollowUp, payment_method, queueId, status } =
+      req.body;
 
     if (!req.body) {
       res.status(400).send({
@@ -72,7 +74,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const payload = {
       patient_id,
       payment_method,
-      queue,
+      queueId,
+      isFollowUp,
       status,
       updatedAt: new Date(),
       _id: id,

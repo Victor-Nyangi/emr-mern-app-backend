@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import Queue from "../models/Queue";
+import Appointment from "../models/Appointment";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -10,78 +10,47 @@ const handleError = (res: Response, error: unknown, statusCode = 500) => {
   res.status(statusCode).json({ message });
 };
 
-// Get all queues
+// Get all appointments
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const queues = await Queue.find();
-
-    res.status(200).json(queues);
+    const appointments = await Appointment.find();
+    res.status(200).json(appointments);
   } catch (error) {
     handleError(res, error, 404);
   }
 };
 
-// Get a single queue
+// Get a single appointment
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const queue = await Queue.findById(req.params.id);
-    if (!queue) res.status(404).json({ message: "Queue not found" });
-    res.status(200).json(queue);
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment)
+      res.status(404).json({ message: "Appointment not found" });
+    res.status(200).json(appointment);
   } catch (error) {
     handleError(res, error, 404);
   }
 };
 
-// Create a queue
+// Create a new appointment
 export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    departmentId,
-    name,
-    priority,
-    status,
-    assignedTo,
-    serviceStartTime,
-    serviceEndTime,
-    notes,
-  } = req.body;
-
   try {
-    const newQueue = new Queue({
-      departmentId,
-      name,
-      priority,
-      status,
-      assignedTo,
-      serviceStartTime,
-      serviceEndTime,
-      notes,
-    });
-
-    const savedQueue = await newQueue.save();
-    res.status(201).json(savedQueue);
+    const newAppointment = new Appointment(req.body);
+    const savedAppointment = await newAppointment.save();
+    res.status(201).json(savedAppointment);
   } catch (error) {
     handleError(res, error, 400);
   }
 };
 
-// Update queue
+// Update a appointment
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const {
-      departmentId,
-      name,
-      priority,
-      status,
-      assignedTo,
-      serviceStartTime,
-      serviceEndTime,
-      notes,
-    } = req.body;
+    const { patient_id, medicalProvider_id, status, type, date } = req.body;
 
     if (!req.body) {
       res.status(400).send({
@@ -90,28 +59,32 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     }
 
     const payload = {
-      departmentId,
-      name,
-      priority,
+      patient_id,
+      medicalProvider_id,
       status,
-      assignedTo,
-      serviceStartTime,
-      serviceEndTime,
-      notes,
+      type,
+      date,
       _id: id,
     };
 
-    const updatedQueue = await Queue.findByIdAndUpdate(id, payload, {
-      new: true,
-    });
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      id,
+      payload,
+      {
+        new: true,
+      }
+    );
+    if (!updatedAppointment)
+      res.status(404).json({ message: "Appointment not found" });
 
-    res.json(updatedQueue);
+    res.json(updatedAppointment);
   } catch (error) {
     handleError(res, error, 400);
   }
 };
 
-export const deleteQueue = async (
+// Delete a appointment
+export const deleteAppointment = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -120,10 +93,11 @@ export const deleteQueue = async (
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const deletedQueue = await Queue.findByIdAndDelete(id);
-    if (!deletedQueue) res.status(404).json({ message: "Queue not found" });
+    const deletedAppointment = await Appointment.findByIdAndDelete(id);
+    if (!deletedAppointment)
+      res.status(404).json({ message: "Appointment not found" });
 
-    res.json({ message: "Queue deleted successfully" });
+    res.json({ message: "Appointment deleted successfully" });
   } catch (error) {
     handleError(res, error, 500);
   }

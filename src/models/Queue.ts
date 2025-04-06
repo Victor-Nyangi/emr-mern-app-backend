@@ -1,47 +1,40 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const QueueSchema = new mongoose.Schema({
-  departmentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Department',
-    required: true,
-  },
-  patientId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Patient',
-    required: true,
-  },
-  ticketNumber: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  priority: {
-    type: String,
-    enum: ['Emergency', 'High', 'Normal', 'Low'],
-    default: 'Normal',
-  },
-  status: {
-    type: String,
-    enum: ['Waiting', 'Called', 'In Service', 'Completed', 'Cancelled'],
-    default: 'Waiting',
-  },
-  assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: null,
-  },
-  arrivalTime: {
-    type: Date,
-    default: Date.now,
-  },
-  calledTime: Date,
-  serviceStartTime: Date,
-  serviceEndTime: Date,
-  notes: String,
-}, {
-  timestamps: true // adds createdAt and updatedAt
-});
+const QueueSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    departmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: true,
+    },
+    priority: {
+      type: String,
+      enum: ["EMERGENCY", "HIGH", "NORMAL", "LOW"],
+      default: "NORMAL",
+    },
+    status: {
+      type: String,
+      enum: ["WAITING", "CALLED", "IN SERVICE", "COMPLETED", "CANCELLED"],
+      default: "WAITING",
+    },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MedicalProvider",
+      default: null,
+    },
 
-const Queue = mongoose.model('Queue', QueueSchema);
+    serviceStartTime: Date,
+    serviceEndTime: Date,
+    notes: String,
+  },
+  {
+    timestamps: true, // adds createdAt and updatedAt
+  }
+);
+
+const Queue = mongoose.model("Queue", QueueSchema);
 export default Queue;
