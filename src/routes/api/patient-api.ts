@@ -5,6 +5,7 @@ import {
   update,
   single,
   deletePatient,
+  getPoliciesByPatient,
 } from "../../controllers/patientController";
 
 const router = Router();
@@ -22,5 +23,8 @@ router.patch("/:id", update);
 
 // Delete a patient with id
 router.delete("/:id", deletePatient);
+
+// Get policies for a specific patient
+router.get("/:patientId/policies", getPoliciesByPatient);
 
 export default router;

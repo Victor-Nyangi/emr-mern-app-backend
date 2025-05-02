@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Patient from "../models/Patient";
+import Policy from "../models/Insurance/Policy";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -55,7 +56,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       blood_group,
       allergies,
       underlying_conditions,
-      insurance,
       medications,
       updated_date,
       is_active,
@@ -81,7 +81,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       blood_group,
       allergies,
       underlying_conditions,
-      insurance,
       medications,
       updated_date,
       is_active,
@@ -123,7 +122,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       blood_group,
       allergies,
       underlying_conditions,
-      insurance,
       medications,
       updated_date,
       is_active,
@@ -155,7 +153,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       blood_group,
       allergies,
       underlying_conditions,
-      insurance,
       medications,
       updated_date,
       is_active,
@@ -188,6 +185,31 @@ export const deletePatient = async (
     if (!deletedPatient) res.status(404).json({ message: "Patient not found" });
 
     res.json({ message: "Patient deleted successfully" });
+  } catch (error) {
+    handleError(res, error, 500);
+  }
+};
+
+// Fetch a patient's policies
+export const getPoliciesByPatient = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const policies = await Policy.find({
+      patientId: req.params.patientId,
+    }).populate([
+      {
+        path: "benefitPlanId",
+        select: "name _id",
+        populate: {
+          path: "insurerId",
+          select: "name _id",
+        },
+      },
+    ]);
+
+    res.status(200).json(policies);
   } catch (error) {
     handleError(res, error, 500);
   }

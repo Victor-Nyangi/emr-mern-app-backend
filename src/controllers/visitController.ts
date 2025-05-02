@@ -13,7 +13,9 @@ const handleError = (res: Response, error: unknown, statusCode = 500) => {
 // Get all visits
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const visits = await Visit.find();
+    const visits = await Visit.find({})
+      .populate("patient_id", "first_name last_name") // Populate patient_id and select only the 'name' field
+      .populate("queueId", "name"); // Populate queueId and select only the 'name' field
 
     res.status(200).json(visits);
   } catch (error) {
@@ -24,7 +26,9 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 // Get a single visit
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const visit = await Visit.findById(req.params.id);
+    const visit = await Visit.findById(req.params.id)
+      .populate("patient_id", "first_name last_name")
+      .populate("queueId", "name");
     if (!visit) res.status(404).json({ message: "Visit not found" });
     res.status(200).json(visit);
   } catch (error) {
