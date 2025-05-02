@@ -15,6 +15,10 @@ import v1messageRoutes from "./routes/api/engagement-api";
 import v1ClinicalNotesRoutes from "./routes/api/clinical-notes-api";
 import v1AppointmentsRoutes from "./routes/api/appointments-api";
 
+import v1Insureroutes from "./routes/api/insurance/insurer-api";
+import v1BenefitPlanRoutes from "./routes/api/insurance/benefit-plan-api";
+import v1PolcyRoutes from "./routes/api/insurance/policy-api";
+
 import homeRoutes from "./routes/home";
 
 // lab_information,
@@ -46,3 +50,7 @@ app.use("/api/v1/financials", v1FinancialRoutes);
 app.use("/api/v1/clinical-notes", v1ClinicalNotesRoutes);
 app.use("/api/v1/appointments", v1AppointmentsRoutes);
 app.use("/api/v1/sms", v1messageRoutes);
+
+app.use("/api/v1/insurance/insurer", v1Insureroutes);
+app.use("/api/v1/insurance/benefit_plans", v1BenefitPlanRoutes);
+app.use("/api/v1/insurance/policy", v1PolcyRoutes);

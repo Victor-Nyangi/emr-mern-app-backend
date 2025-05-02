@@ -77,11 +77,6 @@ const patientSchema = new mongoose.Schema({
     type: [String],
     required: false,
   },
-  insurance: {
-    name: { type: String },
-    policyNumber: { type: String },
-    required: false,
-  },
   medications: [
     {
       name: {
