@@ -4,6 +4,8 @@ import {
   deleteVital,
   getAll,
   update,
+  getVitalsByPatient,
+  getVitalsByVisit,
 } from "../../controllers/vitalController";
 import { Router } from "express";
 
@@ -23,5 +25,11 @@ router.patch("/:id", update);
 
 // Delete a vital with id
 router.delete("/:id", deleteVital);
+
+// Fetch a patient's vitals
+router.get("/patient/:patientId", getVitalsByPatient);
+
+// Fetch vitals by visit id
+router.get("/visit/:visitId", getVitalsByVisit);
 
 export default router;

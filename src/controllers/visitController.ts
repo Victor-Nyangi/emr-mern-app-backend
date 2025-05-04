@@ -27,7 +27,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
     const visit = await Visit.findById(req.params.id)
-      .populate("patient_id", "first_name last_name")
+      .populate("patient_id", "first_name last_name _id")
       .populate("queueId", "name");
     if (!visit) res.status(404).json({ message: "Visit not found" });
     res.status(200).json(visit);

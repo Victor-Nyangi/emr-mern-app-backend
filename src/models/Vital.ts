@@ -7,8 +7,13 @@ const vitalSchema = new mongoose.Schema(
       ref: "Patient",
       required: true,
     },
+    visit_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Visit",
+      required: true,
+    },
     body_temperature: {
-      type: Number,
+      type: String,
       required: true,
     },
     pulse_rate: {
@@ -33,7 +38,6 @@ const vitalSchema = new mongoose.Schema(
     },
     blood_glucose: {
       type: String,
-      required: true,
     },
     health_status: {
       type: String,
