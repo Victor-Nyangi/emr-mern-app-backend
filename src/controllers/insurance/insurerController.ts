@@ -29,8 +29,9 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 
     const benefitPlans = await BenefitPlan.find(
       { insurerId },
-      "name description coverageType coverageDetails coveredServices"
-    ).lean(); // Returns plain JS object instead of Mongoose doc
+      "name description coverageType createdAt"
+    ).populate("insurerId", "name _id")
+      .lean(); // Returns plain JS object instead of Mongoose doc
 
     if (!insurer) res.status(404).json({ message: "Insurer not found" });
     res.status(200).json({ insurer: insurer, benefit_plans: benefitPlans });
@@ -39,7 +40,7 @@ export const single = async (req: Request, res: Response): Promise<void> => {
   }
 };
 export const create = async (req: Request, res: Response): Promise<void> => {
-  const { name, status, panel, payerId, contnact, agent } = req.body;
+  const { name, status, panel, payerId, contact, agent } = req.body;
 
   try {
     const newInsurer = new Insurer({
@@ -47,7 +48,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       status,
       panel,
       payerId,
-      contnact,
+      contact,
       agent,
     });
 
@@ -65,7 +66,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const { name, status, panel, payerId, contnact, agent } = req.body;
+    const { name, status, panel, payerId, contact, agent } = req.body;
 
     if (!req.body) {
       res.status(400).send({
@@ -73,7 +74,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       });
     }
 
-    const payload = { name, status, panel, payerId, contnact, agent, _id: id };
+    const payload = { name, status, panel, payerId, contact, agent, _id: id };
 
     const updatedInsurer = await Insurer.findByIdAndUpdate(id, payload, {
       new: true,

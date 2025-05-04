@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import Appointment from "../models/Appointment";
+import Appointment from "../models/Patient/Appointment";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -13,7 +13,16 @@ const handleError = (res: Response, error: unknown, statusCode = 500) => {
 // Get all appointments
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const appointments = await Appointment.find();
+    const appointments = await Appointment.find({}).populate([
+      {
+        path: "medicalProvider_id",
+        select: "first_name last_name salutation _id",
+      },
+      {
+        path: "patient_id",
+        select: "first_name last_name salutation _id",
+      },
+    ]);
     res.status(200).json(appointments);
   } catch (error) {
     handleError(res, error, 404);
@@ -23,7 +32,16 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 // Get a single appointment
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findById(req.params.id).populate([
+      {
+        path: "medicalProvider_id",
+        select: "first_name last_name salutation _id",
+      },
+      {
+        path: "patient_id",
+        select: "first_name last_name salutation _id",
+      },
+    ]);
     if (!appointment)
       res.status(404).json({ message: "Appointment not found" });
     res.status(200).json(appointment);
