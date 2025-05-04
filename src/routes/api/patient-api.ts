@@ -6,6 +6,8 @@ import {
   single,
   deletePatient,
   getPoliciesByPatient,
+  getClinicalNotesByPatient,
+  getAppointmentsByPatient,
 } from "../../controllers/patientController";
 
 const router = Router();
@@ -26,5 +28,11 @@ router.delete("/:id", deletePatient);
 
 // Get policies for a specific patient
 router.get("/:patientId/policies", getPoliciesByPatient);
+
+// Get appoibtments for a specific patient
+router.get("/:patientId/appointments", getAppointmentsByPatient);
+
+// Get clinical notes for a specific patient
+router.get("/:patientId/clinical-notes", getClinicalNotesByPatient);
 
 export default router;

@@ -1,7 +1,7 @@
 import {
   create,
   single,
-  deleteClinicalNotes,
+  deleteClinicalNote,
   getAll,
   update,
 } from "../../controllers/clinicalNotesController";
@@ -22,6 +22,6 @@ router.get("/:id", single);
 router.patch("/:id", update);
 
 // Delete a clinicalNote with id
-router.delete("/:id", deleteClinicalNotes);
+router.delete("/:id", deleteClinicalNote);
 
 export default router;

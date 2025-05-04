@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
+import ClinicalNote from "../models/Patient/ClinicalNote";
 import mongoose from "mongoose";
-import ClinicalNotes from "../models/ClinicalNotes";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -13,7 +13,16 @@ const handleError = (res: Response, error: unknown, statusCode = 500) => {
 // Get all clinicalNotes
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const clinicalNotes = await ClinicalNotes.find();
+    const clinicalNotes = await ClinicalNote.find({}).populate([
+      {
+        path: "medicalProvider_id",
+        select: "first_name last_name salutation _id",
+      },
+      {
+        path: "patient_id",
+        select: "first_name last_name salutation _id",
+      },
+    ]);
     res.status(200).json(clinicalNotes);
   } catch (error) {
     handleError(res, error, 404);
@@ -23,8 +32,18 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 // Get a single clinicalNote
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const clinicalNote = await ClinicalNotes.findById(req.params.id);
-    if (!clinicalNote) res.status(404).json({ message: "ClinicalNotes not found" });
+    const clinicalNote = await ClinicalNote.findById(req.params.id).populate([
+      {
+        path: "medicalProvider_id",
+        select: "first_name last_name salutation _id",
+      },
+      {
+        path: "patient_id",
+        select: "first_name last_name salutation _id",
+      },
+    ]);
+    if (!clinicalNote)
+      res.status(404).json({ message: "ClinicalNote not found" });
     res.status(200).json(clinicalNote);
   } catch (error) {
     handleError(res, error, 404);
@@ -33,19 +52,18 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 
 // Create a clinicalNote
 export const create = async (req: Request, res: Response): Promise<void> => {
-  const { patient_id, medicalProvider_id, content } =
-    req.body;
+  const { patient_id, medicalProvider_id, content } = req.body;
 
   try {
-    const newClinicalNotes = new ClinicalNotes({
+    const newClinicalNote = new ClinicalNote({
       patient_id,
       medicalProvider_id,
-      content
+      content,
     });
 
-    const savedClinicalNotes = await newClinicalNotes.save();
+    const savedClinicalNote = await newClinicalNote.save();
 
-    res.status(201).json(savedClinicalNotes);
+    res.status(201).json(savedClinicalNote);
   } catch (error) {
     handleError(res, error, 400);
   }
@@ -59,8 +77,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const { patient_id, medicalProvider_id, content} =
-      req.body;
+    const { patient_id, medicalProvider_id, content } = req.body;
     if (!req.body) {
       res.status(400).send({
         message: "Please fill all required fields",
@@ -74,19 +91,24 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       _id: id,
     };
 
-    const updatedClinicalNotes = await ClinicalNotes.findByIdAndUpdate(id, payload, {
-      new: true,
-    });
-    if (!updatedClinicalNotes) res.status(404).json({ message: "ClinicalNotes not found" });
+    const updatedClinicalNote = await ClinicalNote.findByIdAndUpdate(
+      id,
+      payload,
+      {
+        new: true,
+      }
+    );
+    if (!updatedClinicalNote)
+      res.status(404).json({ message: "ClinicalNote not found" });
 
-    res.json(updatedClinicalNotes);
+    res.json(updatedClinicalNote);
   } catch (error) {
     handleError(res, error, 400);
   }
 };
 
 // Delete a clinicalNote
-export const deleteClinicalNotes = async (
+export const deleteClinicalNote = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -95,10 +117,11 @@ export const deleteClinicalNotes = async (
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).json({ message: "Invalid ID" });
 
-    const deletedClinicalNotes = await ClinicalNotes.findByIdAndDelete(id);
-    if (!deletedClinicalNotes) res.status(404).json({ message: "ClinicalNotes not found" });
+    const deletedClinicalNote = await ClinicalNote.findByIdAndDelete(id);
+    if (!deletedClinicalNote)
+      res.status(404).json({ message: "ClinicalNote not found" });
 
-    res.json({ message: "ClinicalNotes deleted successfully" });
+    res.json({ message: "ClinicalNote deleted successfully" });
   } catch (error) {
     handleError(res, error, 500);
   }

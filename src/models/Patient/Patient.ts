@@ -37,36 +37,8 @@ const patientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  marital_status: {
-    type: String,
-    required: false,
-  },
-  education_level: {
-    type: String,
-    required: false,
-  },
-  income_level: {
-    type: String,
-    required: false,
-  },
-  occupation: {
-    type: String,
-    required: false,
-  },
-  size_of_family: {
-    type: Number,
-    required: false,
-  },
   emergency_contact: {
     type: String,
-    required: true,
-  },
-  height: {
-    type: Number,
-    required: true,
-  },
-  weight: {
-    type: Number,
     required: true,
   },
   allergies: {

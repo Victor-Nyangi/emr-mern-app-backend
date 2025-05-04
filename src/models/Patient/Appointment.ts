@@ -14,11 +14,18 @@ const appointmentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "PENDING",
+      required: true,
+      enum: ["Scheduled", "Completed", "Cancelled"],
     },
     type: {
       type: String,
       required: true,
+      enum: ["Consultation", "Annual Physical", "Follow-up"],
+    },
+    time: {
+      type: String,
+      required: true,
+      match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, // simple HH:MM validation
     },
     date: {
       type: Date,

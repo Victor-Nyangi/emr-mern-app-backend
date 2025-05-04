@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import BenefitPlan from "../../models/Insurance/BenefitPlan";
+import Policy from "../../models/Insurance/Policy";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -140,6 +141,35 @@ export const deleteBenefitPlan = async (
       res.status(404).json({ message: "Benefit Plan not found" });
 
     res.json({ message: "Benefit Plan deleted successfully" });
+  } catch (error) {
+    handleError(res, error, 500);
+  }
+};
+
+// Fetch a benefit plan's policies
+export const getPoliciesByBenefitPlan = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const policies = await Policy.find({
+      benefitPlanId: req.params.benefitPlanId,
+    }).populate([
+      {
+        path: "patientId",
+        select: "first_name last_name _id",
+      },
+      {
+        path: "benefitPlanId",
+        select: "name _id",
+        populate: {
+          path: "insurerId",
+          select: "name _id",
+        },
+      },
+    ]);
+
+    res.status(200).json(policies);
   } catch (error) {
     handleError(res, error, 500);
   }

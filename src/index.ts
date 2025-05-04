@@ -51,6 +51,6 @@ app.use("/api/v1/clinical-notes", v1ClinicalNotesRoutes);
 app.use("/api/v1/appointments", v1AppointmentsRoutes);
 app.use("/api/v1/sms", v1messageRoutes);
 
-app.use("/api/v1/insurance/insurer", v1Insureroutes);
-app.use("/api/v1/insurance/benefit_plans", v1BenefitPlanRoutes);
-app.use("/api/v1/insurance/policy", v1PolcyRoutes);
+app.use("/api/v1/insurance/insurers", v1Insureroutes);
+app.use("/api/v1/insurance/benefit-plans", v1BenefitPlanRoutes);
+app.use("/api/v1/insurance/policies", v1PolcyRoutes);
