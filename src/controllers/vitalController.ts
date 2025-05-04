@@ -34,6 +34,7 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 export const create = async (req: Request, res: Response) => {
   const {
     patient_id,
+    visit_id,
     body_temperature,
     pulse_rate,
     respiration_rate,
@@ -48,6 +49,7 @@ export const create = async (req: Request, res: Response) => {
   try {
     const newVital = new Vital({
       patient_id,
+      visit_id,
       body_temperature,
       pulse_rate,
       respiration_rate,
@@ -73,7 +75,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({ message: "Invalid ID" });
 
     const {
-      patient_id,
       body_temperature,
       pulse_rate,
       respiration_rate,
@@ -95,7 +96,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       res.status(404).send(`No vital with id: ${id}`);
 
     const payload = {
-      patient_id,
       body_temperature,
       pulse_rate,
       respiration_rate,
@@ -133,6 +133,48 @@ export const deleteVital = async (
     if (!deletedVital) res.status(404).json({ message: "Vital not found" });
 
     res.json({ message: "Vital deleted successfully" });
+  } catch (error) {
+    handleError(res, error, 500);
+  }
+};
+
+// Fetch a patient's vitals
+export const getVitalsByPatient = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const vitals = await Vital.find({
+      patient_id: req.params.patientId,
+    }).populate([
+      {
+        path: "patient_id",
+        select: "first_name last_name _id",
+      },
+    ]);
+
+    res.status(200).json(vitals);
+  } catch (error) {
+    handleError(res, error, 500);
+  }
+};
+
+// Fetch a visit's vitals
+export const getVitalsByVisit = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const vitals = await Vital.find({
+      visit_id: req.params.visitId,
+    }).populate([
+      {
+        path: "patient_id",
+        select: "first_name last_name _id",
+      },
+    ]);
+
+    res.status(200).json(vitals);
   } catch (error) {
     handleError(res, error, 500);
   }
