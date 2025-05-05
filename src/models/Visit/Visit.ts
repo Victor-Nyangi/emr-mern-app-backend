@@ -18,7 +18,7 @@ const visitSchema = new mongoose.Schema(
       required: true,
     },
     isFollowUp: {
-      Boolean,
+      type: Boolean,
       default: false,
     },
     status: {
@@ -29,6 +29,19 @@ const visitSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    startTime: { type: Date, default: Date.now },
+    endTime: { type: Date, default: Date.now },
+    duration: { type: String }, // or Number (minutes), but String is fine for display
+    currentQueue: {
+      type: String,
+    },
+    transitions: [
+      {
+        queue: { type: String }, // e.g., "Consultation"
+        prev_queue: { type: String }, // e.g., "Triage"
+        enteredAt: { type: Date, default: Date.now },
+      },
+    ],
     notes: String,
   },
   {
