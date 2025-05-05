@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import Visit from "../models/Visit";
+import Visit from "../models/Visit/Visit";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {

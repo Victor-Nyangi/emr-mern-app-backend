@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-/** A patient's invoice details */
+/** A patient's billing details */
 const billingSchema = new mongoose.Schema({
   patient_name: {
     type: String,
