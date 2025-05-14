@@ -15,7 +15,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const visits = await Visit.find({})
       .populate("patient_id", "first_name last_name") // Populate patient_id and select only the 'name' field
-      .populate("queueId", "name"); // Populate queueId and select only the 'name' field
+      .populate("currentQueue", "name"); // Populate currentQueue and select only the 'name' field
 
     res.status(200).json(visits);
   } catch (error) {
@@ -28,7 +28,7 @@ export const single = async (req: Request, res: Response): Promise<void> => {
   try {
     const visit = await Visit.findById(req.params.id)
       .populate("patient_id", "first_name last_name _id")
-      .populate("queueId", "name");
+      .populate("currentQueue", "name");
     if (!visit) res.status(404).json({ message: "Visit not found" });
     res.status(200).json(visit);
   } catch (error) {
@@ -39,12 +39,12 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 // Create a visit
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { patient_id, payment_method, queueId, isFollowUp } = req.body;
+    const { patient_id, payment_method, currentQueue, isFollowUp } = req.body;
 
     const newVisit = new Visit({
       patient_id,
       payment_method,
-      queueId,
+      currentQueue,
       isFollowUp,
       status: "ARRIVED",
       createdAt: new Date(),
@@ -66,8 +66,13 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).send(`No visit with id: ${id}`);
 
-    const { patient_id, isFollowUp, payment_method, queueId, status } =
-      req.body;
+    const {
+      patient_id,
+      isFollowUp,
+      payment_method,
+      currentQueue,
+      status,
+    } = req.body;
 
     if (!req.body) {
       res.status(400).send({
@@ -78,14 +83,62 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const payload = {
       patient_id,
       payment_method,
-      queueId,
       isFollowUp,
       status,
+      currentQueue,
+      startTime: new Date(),
       updatedAt: new Date(),
       _id: id,
     };
 
     const updatedVisit = await Visit.findByIdAndUpdate(id, payload, {
+      new: true,
+    });
+
+    if (!updatedVisit) res.status(404).json({ message: "Visit not found" });
+
+    res.json(updatedVisit);
+  } catch (error) {
+    handleError(res, error, 400);
+  }
+};
+
+// Transition a visit
+export const transition = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id))
+      res.status(404).send(`No visit with id: ${id}`);
+
+    const { status, transitions } = req.body;
+
+    if (!req.body) {
+      res.status(400).send({
+        message: "Please fill all required fields",
+      });
+    }
+    let payload = {};
+
+    const basePayload = {
+      status,
+      transitions,
+      updatedAt: new Date(),
+      _id: id,
+    };
+
+    if (status === "COMPLETED") {
+      payload = {
+        endTime: new Date(),
+        _id: id,
+      };
+    }
+
+    const finalPayload = { ...basePayload, ...payload };
+    const updatedVisit = await Visit.findByIdAndUpdate(id, finalPayload, {
       new: true,
     });
 

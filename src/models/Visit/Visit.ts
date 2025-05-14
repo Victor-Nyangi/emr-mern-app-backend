@@ -7,11 +7,6 @@ const visitSchema = new mongoose.Schema(
       ref: "Patient",
       required: true,
     },
-    queueId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Queue",
-      required: true,
-    },
     payment_method: {
       type: String,
       enum: ["Cash", "Insurance", "Card", "MobileMoney", "Free"],
@@ -30,10 +25,12 @@ const visitSchema = new mongoose.Schema(
       default: Date.now,
     },
     startTime: { type: Date, default: Date.now },
-    endTime: { type: Date, default: Date.now },
+    endTime: { type: Date },
     duration: { type: String }, // or Number (minutes), but String is fine for display
     currentQueue: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Queue",
+      required: true,
     },
     transitions: [
       {

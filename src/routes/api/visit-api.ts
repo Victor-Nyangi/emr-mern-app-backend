@@ -5,6 +5,7 @@ import {
   update,
   single,
   cancelVisit,
+  transition,
 } from "../../controllers/visitController";
 
 const router = Router();
@@ -22,5 +23,8 @@ router.patch("/:id", update);
 
 // Cancel a visit with id
 router.patch("/:id", cancelVisit);
+
+// Transition a visit with id
+router.patch("/transition/:id/", transition);
 
 export default router;

@@ -165,14 +165,14 @@ export const getVitalsByVisit = async (
   res: Response
 ): Promise<void> => {
   try {
-    const vitals = await Vital.find({
-      visit_id: req.params.visitId,
-    }).populate([
+    const vitals = await Vital.findOne(
       {
-        path: "patient_id",
-        select: "first_name last_name _id",
+        visit_id: req.params.visitId,
       },
-    ]);
+      "body_temperature pulse_rate respiration_rate blood_pressure blood_glucose overall_status weight health_status"
+    )
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.status(200).json(vitals);
   } catch (error) {
