@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const prescriptionSchema = new Schema(
+const medicationSchema = new Schema(
   {
     medication: {
       type: String,
@@ -38,21 +38,20 @@ const prescriptionSchema = new Schema(
     },
     prescribedBy: {
       type: Schema.Types.ObjectId,
-      ref: "MedicalProvider", //  Reference to the MedicalProvider model
+      ref: "MedicalProvider",
       required: true,
       index: true,
     },
     patientId: {
-      // Add patientId for easier querying
       type: Schema.Types.ObjectId,
       ref: "Patient",
       required: true,
       index: true,
     },
     visitId: {
-      //add visit id
       type: Schema.Types.ObjectId,
       ref: "Visit",
+      required: true,
       index: true,
     },
     notes: {
@@ -63,6 +62,6 @@ const prescriptionSchema = new Schema(
   { timestamps: true }
 );
 
-const Prescription = mongoose.model("Prescription", prescriptionSchema);
+const Medication = mongoose.model("Medication", medicationSchema);
 
-export default Prescription;
+export default Medication;

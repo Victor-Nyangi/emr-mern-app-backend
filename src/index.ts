@@ -18,6 +18,11 @@ import v1AppointmentsRoutes from "./routes/api/appointments-api";
 import v1Insureroutes from "./routes/api/insurance/insurer-api";
 import v1BenefitPlanRoutes from "./routes/api/insurance/benefit-plan-api";
 import v1PolcyRoutes from "./routes/api/insurance/policy-api";
+import v1DiagnosisRoutes from "./routes/api/diagnosis-api";
+import v1TestsRoutes from "./routes/api/tests-api";
+import v1MedicationsRoutes from "./routes/api/medications-api";
+import v1VisitClinicalNotesRoutes from "./routes/api/visit/visit-clinical-notes-api";
+
 
 import homeRoutes from "./routes/home";
 
@@ -54,3 +59,8 @@ app.use("/api/v1/sms", v1messageRoutes);
 app.use("/api/v1/insurance/insurers", v1Insureroutes);
 app.use("/api/v1/insurance/benefit-plans", v1BenefitPlanRoutes);
 app.use("/api/v1/insurance/policies", v1PolcyRoutes);
+app.use("/api/v1/diagnosis", v1DiagnosisRoutes);
+app.use("/api/v1/tests", v1TestsRoutes);
+app.use("/api/v1/medications", v1MedicationsRoutes);
+app.use("/api/v1/visit-clinical-notes", v1VisitClinicalNotesRoutes);
+
