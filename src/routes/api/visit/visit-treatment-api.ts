@@ -3,9 +3,9 @@ import {
   single,
   getAll,
   update,
-  deleteVisitClinicalNote,
-  getClinicalNotesByVisit,
-} from "../../../controllers/visit/visitClinicalNotesController";
+  deleteTreatment,
+  getTreatmentsByVisit,
+} from "../../../controllers/visit/treatmentController";
 
 import { Router } from "express";
 
@@ -20,12 +20,12 @@ router.post("/", create);
 // Retrieve a single clinicalNote with id
 router.get("/:id", single);
 
-// Update a clinicalNote with id
+// Update a treatment with id
 router.patch("/:id", update);
 
 // Delete a clinicalNote with id
-router.delete("/:id", deleteVisitClinicalNote);
+router.delete("/:id", deleteTreatment);
 
-// Fetch clinicalNote by visit id
-router.get("/visit/:visitId", getClinicalNotesByVisit);
+// Fetch treatment by visit id
+router.get("/visit/:visitId", getTreatmentsByVisit);
 export default router;
