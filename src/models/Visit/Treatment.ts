@@ -2,17 +2,26 @@ import mongoose, { Schema } from "mongoose";
 
 const treatmentSchema = new mongoose.Schema(
   {
-    visit_id: {
+    visitId: {
       type: Schema.Types.ObjectId,
       ref: "Visit",
       required: true,
       index: true,
     },
-    procedure: {
+    name: {
       type: String,
       required: true, // e.g., "Wound Debridement"
     },
-    date: {
+    type: {
+      type: String,
+      enum: ["Procedure", "Periodic", "Wholesome", "Other"],
+      default: "Procedure",
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
       type: Date,
       required: true,
     },
@@ -24,8 +33,8 @@ const treatmentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Planned", "Ongoing", "Completed", "Cancelled"],
-      default: "Planned",
+      enum: ["Scheduled", "Ongoing", "Completed", "Cancelled"],
+      default: "Scheduled",
     },
     notes: {
       type: String,
