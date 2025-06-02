@@ -8,16 +8,16 @@ const invoiceSchema = new mongoose.Schema(
       ref: "Visit",
       required: true,
     },
-    services_charged: {
-      type: [String],
-      required: false,
+    service_charged: {
+      type: String,
+      required: true,
     },
     description: {
       type: String,
       required: false,
     },
     payment_mode: {
-      type: [String],
+      type: String,
       enum: ["COPAY", "INSURANCE", "SELF"],
       default: "SELF",
     },

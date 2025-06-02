@@ -35,7 +35,7 @@ export const single = async (req: Request, res: Response): Promise<void> => {
 export const create = async (req: Request, res: Response): Promise<void> => {
   const {
     visitId,
-    services_charged,
+    service_charged,
     description,
     payment_mode,
     amount,
@@ -50,7 +50,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const newInvoice = new Invoice({
       visitId,
-      services_charged,
+      service_charged,
       description,
       payment_mode,
       amount,
@@ -75,7 +75,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({ message: "Invalid ID" });
 
     const {
-      services_charged,
+      service_charged,
       description,
       payment_mode,
       amount,
@@ -91,7 +91,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     }
 
     const payload = {
-      services_charged,
+      service_charged,
       description,
       payment_mode,
       amount,
@@ -142,7 +142,7 @@ export const getInvoicesByVisit = async (
       {
         visitId: req.params.visitId,
       },
-      "visitId services_charged description payment_mode amount copayAmount status notes invoiceNumber createdAt"
+      "visitId service_charged description payment_mode amount copayAmount status notes invoiceNumber createdAt"
     )
       .sort({ createdAt: -1 })
       .lean();
@@ -151,9 +151,12 @@ export const getInvoicesByVisit = async (
       (acc, invoice) => {
         acc.totalAmount += invoice.amount || 0;
         acc.totalCopay += invoice.copayAmount || 0;
+        if (invoice.status === "UNPAID") {
+          acc.totalUnpaid += invoice.amount || 0;
+        }
         return acc;
       },
-      { totalAmount: 0, totalCopay: 0 }
+      { totalAmount: 0, totalCopay: 0, totalUnpaid: 0 }
     );
 
     // Example return
