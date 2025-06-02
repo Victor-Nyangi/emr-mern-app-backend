@@ -13,7 +13,16 @@ const handleError = (res: Response, error: unknown, statusCode = 500) => {
 // Get all queues
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const queues = await Queue.find();
+    const queues = await Queue.find({}).populate([
+      {
+        path: "departmentId",
+        select: "name _id",
+      },
+      {
+        path: "assignedTo",
+        select: "first_name last_name salutation _id",
+      },
+    ]);
 
     res.status(200).json(queues);
   } catch (error) {
@@ -24,7 +33,16 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 // Get a single queue
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const queue = await Queue.findById(req.params.id);
+    const queue = await Queue.findById(req.params.id).populate([
+      {
+        path: "departmentId",
+        select: "name _id",
+      },
+      {
+        path: "assignedTo",
+        select: "first_name last_name salutation _id",
+      },
+    ]);
     if (!queue) res.status(404).json({ message: "Queue not found" });
     res.status(200).json(queue);
   } catch (error) {

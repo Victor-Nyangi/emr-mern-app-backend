@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Visit from "../models/Visit/Visit";
+import Patient from "../models/Patient/Patient";
 
 // Centralized error handler
 const handleError = (res: Response, error: unknown, statusCode = 500) => {
@@ -26,11 +27,26 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 // Get a single visit
 export const single = async (req: Request, res: Response): Promise<void> => {
   try {
-    const visit = await Visit.findById(req.params.id)
-      .populate("patient_id", "first_name last_name _id")
-      .populate("currentQueue", "name");
+    const visit = await Visit.findById(req.params.id).populate([
+      {
+        path: "currentQueue",
+        select: "name _id",
+        populate: [
+          {
+            path: "departmentId",
+            select: "name _id",
+          },
+          {
+            path: "assignedTo",
+            select: "first_name last_name salutation _id",
+          },
+        ],
+      },
+    ]);
+    const patient = await Patient.findById(visit?.patient_id);
+
     if (!visit) res.status(404).json({ message: "Visit not found" });
-    res.status(200).json(visit);
+    res.status(200).json({ visit, patient });
   } catch (error) {
     handleError(res, error, 404);
   }
@@ -66,13 +82,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).send(`No visit with id: ${id}`);
 
-    const {
-      patient_id,
-      isFollowUp,
-      payment_method,
-      currentQueue,
-      status,
-    } = req.body;
+    const { patient_id, isFollowUp, payment_method, currentQueue, status } =
+      req.body;
 
     if (!req.body) {
       res.status(400).send({
