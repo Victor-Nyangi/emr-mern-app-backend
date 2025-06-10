@@ -141,9 +141,22 @@ export const transition = async (
       _id: id,
     };
 
+    const visit = await Visit.findById(req.params.id);
+
+    const currentTime = new Date();
+    if (visit?.startTime) {
+      const diffMs = currentTime.getTime() - visit.startTime.getTime();
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      payload = {
+        duration: diffMin,
+        ...payload,
+      };
+    }
+
     if (status === "COMPLETED") {
       payload = {
-        endTime: new Date(),
+        endTime: currentTime,
         _id: id,
       };
     }

@@ -18,6 +18,7 @@ const visitSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["ARRIVED", "COMPLETED", "IN PROGRESS", "CANCELLED", "STALE"],
       default: "ARRIVED",
     },
     visitDate: {
@@ -26,7 +27,7 @@ const visitSchema = new mongoose.Schema(
     },
     startTime: { type: Date, default: Date.now },
     endTime: { type: Date },
-    duration: { type: String }, // or Number (minutes), but String is fine for display
+    duration: { type: String },
     currentQueue: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Queue",

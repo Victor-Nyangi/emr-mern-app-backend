@@ -22,7 +22,7 @@ router.get("/:id", single);
 router.patch("/:id", update);
 
 // Cancel a visit with id
-router.patch("/:id", cancelVisit);
+router.patch("/cancel/:id", cancelVisit);
 
 // Transition a visit with id
 router.patch("/transition/:id/", transition);
