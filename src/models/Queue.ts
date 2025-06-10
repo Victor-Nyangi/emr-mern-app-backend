@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// Set up schedules instead of serviceStartTime and serviceEndTime
+
 const QueueSchema = new mongoose.Schema(
   {
     name: {
@@ -26,7 +28,6 @@ const QueueSchema = new mongoose.Schema(
       ref: "MedicalProvider",
       default: null,
     },
-
     serviceStartTime: Date,
     serviceEndTime: Date,
     notes: String,
