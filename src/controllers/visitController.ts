@@ -125,48 +125,45 @@ export const transition = async (
     if (!mongoose.Types.ObjectId.isValid(id))
       res.status(404).send(`No visit with id: ${id}`);
 
-    const { status, transitions } = req.body;
+    const { status, transition } = req.body;
 
-    if (!req.body) {
+    if (!req.body || !status) {
       res.status(400).send({
         message: "Please fill all required fields",
       });
     }
-    let payload = {};
+    const visit = await Visit.findById(id);
+    if (!visit) {
+      res.status(404).json({ message: "Visit not found" });
+      return;
+    }
+    if (transition) {
+      visit.currentQueue = transition.queue;
+      visit?.transitions.push({
+        queue: transition.queue,
+        prev_queue: transition.prev_queue,
+        enteredAt: transition.enteredAt || new Date(),
+      });
+    }
 
-    const basePayload = {
-      status,
-      transitions,
-      updatedAt: new Date(),
-      _id: id,
-    };
+    // Update status and updatedAt
+    visit.status = status;
+    visit.updatedAt = new Date();
 
-    const visit = await Visit.findById(req.params.id);
-
+    // Optionally calculate duration
     const currentTime = new Date();
     if (visit?.startTime) {
       const diffMs = currentTime.getTime() - visit.startTime.getTime();
       const diffSec = Math.floor(diffMs / 1000);
       const diffMin = Math.floor(diffSec / 60);
-      payload = {
-        duration: diffMin,
-        ...payload,
-      };
+      visit.duration = diffMin.toString();
     }
 
     if (status === "COMPLETED") {
-      payload = {
-        endTime: currentTime,
-        _id: id,
-      };
+      visit.endTime = currentTime;
     }
 
-    const finalPayload = { ...basePayload, ...payload };
-    const updatedVisit = await Visit.findByIdAndUpdate(id, finalPayload, {
-      new: true,
-    });
-
-    if (!updatedVisit) res.status(404).json({ message: "Visit not found" });
+    const updatedVisit = await visit.save();
 
     res.json(updatedVisit);
   } catch (error) {
