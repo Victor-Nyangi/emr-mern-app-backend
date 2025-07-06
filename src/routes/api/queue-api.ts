@@ -6,21 +6,32 @@ import {
   single,
   deleteQueue,
 } from "../../controllers/queueController";
+import { protect } from "../../middleware/authMiddleware";
+import {
+  requireAppointmentRead,
+  requireAppointmentWrite,
+  requireAppointmentCreate,
+  requireAppointmentDelete,
+} from "../../middleware/authorizationMiddleware";
 
 const router = Router();
+
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all queues
-router.get("/", getAll);
+router.get("/", requireAppointmentRead, getAll);
 
 // Create a new queue
-router.post("/", create);
+router.post("/", requireAppointmentCreate, create);
 
 // Retrieve a single queue with id
-router.get("/:id", single);
+router.get("/:id", requireAppointmentRead, single);
 
 // Update a queue with id
-router.patch("/:id", update);
+router.patch("/:id", requireAppointmentWrite, update);
 
 // Cancel a queue with id
-router.patch("/:id", deleteQueue);
+router.patch("/:id", requireAppointmentDelete, deleteQueue);
 
 export default router;

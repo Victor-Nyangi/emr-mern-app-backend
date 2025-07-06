@@ -1,10 +1,10 @@
-import AfricasTalking from "africastalking";
+// import AfricasTalking from "africastalking";
 import { Response, Request } from "express";
 
-const africastalking = AfricasTalking({
-  apiKey: process.env.AT_KEY || "",
-  username: "sandbox",
-});
+// const africastalking = AfricasTalking({
+//   apiKey: process.env.AT_KEY || "",
+//   username: "sandbox",
+// });
 
 // Sender IDs allow you to brand your messages as you send them to your customers.
 // There are two kinds of sender IDs, short codes and alphanumerics.
@@ -12,22 +12,22 @@ const africastalking = AfricasTalking({
 // 70907 - shortcode
 // theforest -alphanumeric
 
-export const sendMessage = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  // TODO: Send message
-  try {
-    const result = await africastalking.SMS.send({
-      to: "+254700454757",
-      message: "Hey AT Ninja! Wassup...",
-      from: "70907",
-    });
-    console.log(result);
-  } catch (ex) {
-    console.error(ex);
-  }
-};
+// export const sendMessage = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   // TODO: Send message
+//   try {
+//     const result = await africastalking.SMS.send({
+//       to: "+254700454757",
+//       message: "Hey AT Ninja! Wassup...",
+//       from: "70907",
+//     });
+//     console.log(result);
+//   } catch (ex) {
+//     console.error(ex);
+//   }
+// };
 
 // Inbox callback https://account.africastalking.com/apps/sandbox/sms/inbox/callback
 export const receiveMessage = async (

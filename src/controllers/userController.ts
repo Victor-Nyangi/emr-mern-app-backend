@@ -5,6 +5,7 @@ import User from "../models/User";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import config from "./../config/db";
+import AuthorizationService from "../services/authorizationService";
 
 // Generate JWT
 const generateToken = (id: any) => {
@@ -68,13 +69,27 @@ export const loginUser = expressAsyncHandler(
     const { email, password } = req.body;
 
     // Check for user email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('role');
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      // Get user permissions
+      const userPermissions = await AuthorizationService.getUserPermissions(user._id.toString());
+      const allowedActions = await AuthorizationService.getUserAllowedActions(user._id.toString());
+      const departmentPermissions = await AuthorizationService.getDepartmentPermissions(user._id.toString());
+
+      // Update last login
+      await User.findByIdAndUpdate(user._id, { last_login: new Date() });
+
       res.json({
         _id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
+        department: user.department,
+        employee_id: user.employee_id,
+        permissions: userPermissions?.permissions || [],
+        allowedActions,
+        departmentPermissions,
         token: generateToken(user._id),
       });
     } else {

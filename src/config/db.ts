@@ -48,5 +48,6 @@ export default {
   dbConnection: connectDB,
   client: client,
   JWT_SECRET: process.env.JWT_SECRET || "",
-  AT_KEY: process.env.AT_KEY || ""
+  AT_KEY: process.env.AT_KEY || "",
+  MONGO_URI: uri
 };

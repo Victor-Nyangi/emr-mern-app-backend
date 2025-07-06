@@ -6,22 +6,33 @@ import {
     single,
     deleteFinancial,
   } from "../../controllers/financialController";
+import { protect } from "../../middleware/authMiddleware";
+import {
+  requireBillingRead,
+  requireBillingWrite,
+  requireBillingCreate,
+  requireBillingDelete,
+} from "../../middleware/authorizationMiddleware";
 
 
 const router = Router();
+
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all financials
-router.get('/', getAll);
+router.get('/', requireBillingRead, getAll);
 
 // Create a new financial
-router.post('/', create);
+router.post('/', requireBillingCreate, create);
 
 // Retrieve a single financial with id
-router.get('/:id', single);
+router.get('/:id', requireBillingRead, single);
 
 // Update a financial with id
-router.patch('/:id', update);
+router.patch('/:id', requireBillingWrite, update);
 
 // Delete a financial with id
-router.delete('/:id', deleteFinancial);
+router.delete('/:id', requireBillingDelete, deleteFinancial);
 
 export default router;  

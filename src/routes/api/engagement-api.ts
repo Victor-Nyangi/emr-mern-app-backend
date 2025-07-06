@@ -1,12 +1,12 @@
 import Router from "express";
 import {
-  sendMessage,
+  // sendMessage,
   receiveMessage,
   checkStatus,
 } from "../../controllers/engagementController";
 
 const router = Router();
-router.get("/deliveryreports", sendMessage);
+// router.get("/deliveryreports", sendMessage);
 
 router.post("/receivemessage", receiveMessage);
 

@@ -6,22 +6,27 @@ import {
   update,
 } from "../../controllers/departmentController";
 import { Router } from "express";
+import { protect } from "../../middleware/authMiddleware";
+import { requireAdmin } from "../../middleware/authorizationMiddleware";
 
 const router = Router();
 
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all departments
-router.get("/", getAll);
+router.get("/", requireAdmin, getAll);
 
 // Create a new department
-router.post("/", create);
+router.post("/", requireAdmin, create);
 
 // Retrieve a single department with id
-router.get("/:id", single);
+router.get("/:id", requireAdmin, single);
 
 // Update a department with id
-router.patch("/:id", update);
+router.patch("/:id", requireAdmin, update);
 
 // Delete a department with id
-router.delete("/:id", deleteDepartment);
+router.delete("/:id", requireAdmin, deleteDepartment);
 
 export default router;

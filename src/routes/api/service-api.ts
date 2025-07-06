@@ -6,22 +6,32 @@ import {
   update,
 } from "../../controllers/serviceController";
 import { Router } from "express";
+import { protect } from "../../middleware/authMiddleware";
+import {
+  requireBillingRead,
+  requireBillingWrite,
+  requireBillingCreate,
+  requireBillingDelete,
+} from "../../middleware/authorizationMiddleware";
 
 const router = Router();
 
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all services
-router.get("/", getAll);
+router.get("/", requireBillingRead, getAll);
 
 // Create a new service
-router.post("/", create);
+router.post("/", requireBillingCreate, create);
 
 // Retrieve a single service with id
-router.get("/:id", single);
+router.get("/:id", requireBillingRead, single);
 
 // Update a service with id
-router.patch("/:id", update);
+router.patch("/:id", requireBillingWrite, update);
 
 // Delete a service with id
-router.delete("/:id", deleteService);
+router.delete("/:id", requireBillingDelete, deleteService);
 
 export default router;

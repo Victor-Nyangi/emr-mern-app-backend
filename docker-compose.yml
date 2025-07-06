@@ -1,0 +1,35 @@
+services:
+  openfga:
+    image: openfga/openfga:latest
+    container_name: emr-openfga
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - OPENFGA_HTTP_ADDR=0.0.0.0:8080
+      - OPENFGA_GRPC_ADDR=0.0.0.0:8081
+      - OPENFGA_PLAYGROUND_ENABLED=true
+      - OPENFGA_PLAYGROUND_ADDR=0.0.0.0:3000
+    volumes:
+      - openfga_data:/data
+    command: run
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  openfga-playground:
+    image: openfga/openfga:latest
+    container_name: emr-openfga-playground
+    ports:
+      - "3000:3000"
+    environment:
+      - OPENFGA_PLAYGROUND_ENABLED=true
+      - OPENFGA_PLAYGROUND_ADDR=0.0.0.0:3000
+    depends_on:
+      - openfga
+    command: playground
+
+volumes:
+  openfga_data: 
