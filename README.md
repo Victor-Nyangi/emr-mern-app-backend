@@ -18,12 +18,3 @@ Authorization Service - Core ABAC logic with context-aware permission checking
 Authorization Middleware - Route-level protection with predefined middleware for common operations
 Permission Data - Comprehensive role definitions for admin, doctor, nurse, receptionist, billing specialist, and lab technician
 Seeder Script - Creates roles and test users with different permission levels
-
-### Test Users Created
-
-Admin: admin@emr.com / admin123 (full access)
-Doctor: doctor@emr.com / doctor123 (patient care, department restricted)
-Nurse: nurse@emr.com / nurse123 (patient care, time restricted)
-Receptionist: receptionist@emr.com / receptionist123 (limited access)
-Billing: billing@emr.com / billing123 (billing access)
-Lab Tech: lab@emr.com / lab123 (lab access)

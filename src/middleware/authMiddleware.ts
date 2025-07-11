@@ -24,8 +24,7 @@ export const protect = expressAsyncHandler(
         }
 
         // Verify token
-        // const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const decoded: any= jwt.verify(token, JWT_SECRET);
+        const decoded: any = jwt.verify(token, JWT_SECRET);
 
         // Get user from the token
         req.user = await User.findById(decoded?.id).select("-password");
@@ -36,6 +35,10 @@ export const protect = expressAsyncHandler(
         res.status(401);
         throw new Error("Not authorized");
       }
+    } else {
+      // Handle missing or invalid Authorization header
+      res.status(401);
+      throw new Error("Not authorized, no token");
     }
   }
 );

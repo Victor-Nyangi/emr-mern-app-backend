@@ -24,8 +24,10 @@ import v1MedicationsRoutes from "./routes/api/medications-api";
 import v1VisitClinicalNotesRoutes from "./routes/api/visit/visit-clinical-notes-api";
 import v1TreatmentRoutes from "./routes/api/visit/visit-treatment-api";
 import v1InvoiceRoutes from "./routes/api/visit/visit-invoice-api";
+import v1NotificationRoutes from "./routes/api/notification-api";
 
 import homeRoutes from "./routes/home";
+import './models/Role';
 
 // lab_information,
 
@@ -66,3 +68,4 @@ app.use("/api/v1/medications", v1MedicationsRoutes);
 app.use("/api/v1/visit-clinical-notes", v1VisitClinicalNotesRoutes);
 app.use("/api/v1/visit-treatments", v1TreatmentRoutes);
 app.use("/api/v1/visit-invoices", v1InvoiceRoutes);
+app.use("/api/v1/notifications", v1NotificationRoutes);
