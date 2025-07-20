@@ -25,9 +25,10 @@ import v1VisitClinicalNotesRoutes from "./routes/api/visit/visit-clinical-notes-
 import v1TreatmentRoutes from "./routes/api/visit/visit-treatment-api";
 import v1InvoiceRoutes from "./routes/api/visit/visit-invoice-api";
 import v1NotificationRoutes from "./routes/api/notification-api";
+import v1EmrAiRoutes from "./routes/api/emrAi-api";
 
 import homeRoutes from "./routes/home";
-import './models/Role';
+import "./models/Role";
 
 // lab_information,
 
@@ -69,3 +70,5 @@ app.use("/api/v1/visit-clinical-notes", v1VisitClinicalNotesRoutes);
 app.use("/api/v1/visit-treatments", v1TreatmentRoutes);
 app.use("/api/v1/visit-invoices", v1InvoiceRoutes);
 app.use("/api/v1/notifications", v1NotificationRoutes);
+
+app.use("/api/v1/ask-ai", v1EmrAiRoutes);
