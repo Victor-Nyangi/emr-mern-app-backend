@@ -37,5 +37,9 @@ router.patch("/:id", requireClinicalNotesWrite, update);
 router.delete("/:id", requireClinicalNotesDelete, deleteVisitClinicalNote);
 
 // Fetch clinicalNote by visit id
-router.get("/visit/:visitId", requireClinicalNotesRead, getClinicalNotesByVisit);
+router.get(
+  "/visit/:visitId",
+  requireClinicalNotesRead,
+  getClinicalNotesByVisit,
+);
 export default router;

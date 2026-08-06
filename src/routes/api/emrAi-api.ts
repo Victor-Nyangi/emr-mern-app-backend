@@ -21,7 +21,7 @@ router.post(
     }
     const answer = await askMedicalQuestion(question);
     res.status(201).json({ answer });
-  })
+  }),
 );
 
 export default router;

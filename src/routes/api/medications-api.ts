@@ -41,6 +41,10 @@ router.delete("/:id", requireClinicalNotesDelete, deleteMedication);
 router.get("/visit/:visitId", requireClinicalNotesRead, getMedicationsByVisit);
 
 // Fetch medication by patient id
-router.get("/patient/:patientId", requireClinicalNotesRead, getMedicationsByPatient);
+router.get(
+  "/patient/:patientId",
+  requireClinicalNotesRead,
+  getMedicationsByPatient,
+);
 
 export default router;

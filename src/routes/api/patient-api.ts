@@ -10,6 +10,8 @@ import {
   getAppointmentsByPatient,
 } from "../../controllers/patientController";
 import { protect } from "../../middleware/authMiddleware";
+import { validate } from "../../middleware/validate";
+import { createPatientSchema, updatePatientSchema } from "../../schemas";
 import {
   requirePatientRead,
   requirePatientWrite,
@@ -26,13 +28,18 @@ router.use(protect);
 router.get("/", requirePatientRead, getAll);
 
 // Create a new patient
-router.post("/", requirePatientCreate, create);
+router.post("/", requirePatientCreate, validate(createPatientSchema), create);
 
 // Retrieve a single patient with id
 router.get("/:id", requirePatientRead, single);
 
 // Update a patient with id
-router.patch("/:id", requirePatientWrite, update);
+router.patch(
+  "/:id",
+  requirePatientWrite,
+  validate(updatePatientSchema),
+  update,
+);
 
 // Delete a patient with id
 router.delete("/:id", requirePatientDelete, deletePatient);
@@ -41,9 +48,17 @@ router.delete("/:id", requirePatientDelete, deletePatient);
 router.get("/:patientId/policies", requirePatientRead, getPoliciesByPatient);
 
 // Get appointments for a specific patient
-router.get("/:patientId/appointments", requirePatientRead, getAppointmentsByPatient);
+router.get(
+  "/:patientId/appointments",
+  requirePatientRead,
+  getAppointmentsByPatient,
+);
 
 // Get clinical notes for a specific patient
-router.get("/:patientId/clinical-notes", requirePatientRead, getClinicalNotesByPatient);
+router.get(
+  "/:patientId/clinical-notes",
+  requirePatientRead,
+  getClinicalNotesByPatient,
+);
 
 export default router;
