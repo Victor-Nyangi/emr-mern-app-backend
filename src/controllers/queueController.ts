@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Queue from "../models/Queue";
 
-import { handleError } from "../utils/handleError";
-
 // Get all queues
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const queues = await Queue.find({}).populate([
       {
         path: "departmentId",
@@ -19,14 +18,12 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     ]);
 
     res.status(200).json(queues);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single queue
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const queue = await Queue.findById(req.params.id).populate([
       {
         path: "departmentId",
@@ -37,27 +34,28 @@ export const single = async (req: Request, res: Response): Promise<void> => {
         select: "first_name last_name salutation _id",
       },
     ]);
-    if (!queue) res.status(404).json({ message: "Queue not found" });
+    if (!queue) {
+      res.status(404);
+      throw new Error("Queue not found");
+    }
     res.status(200).json(queue);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a queue
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    departmentId,
-    name,
-    priority,
-    status,
-    assignedTo,
-    serviceStartTime,
-    serviceEndTime,
-    notes,
-  } = req.body;
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      departmentId,
+      name,
+      priority,
+      status,
+      assignedTo,
+      serviceStartTime,
+      serviceEndTime,
+      notes,
+    } = req.body;
 
-  try {
     const newQueue = new Queue({
       departmentId,
       name,
@@ -71,18 +69,18 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
     const savedQueue = await newQueue.save();
     res.status(201).json(savedQueue);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update queue
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const {
       departmentId,
@@ -118,25 +116,23 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     });
 
     res.json(updatedQueue);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const deleteQueue = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteQueue = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedQueue = await Queue.findByIdAndDelete(id);
-    if (!deletedQueue) res.status(404).json({ message: "Queue not found" });
+    if (!deletedQueue) {
+      res.status(404);
+      throw new Error("Queue not found");
+    }
 
     res.json({ message: "Queue deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

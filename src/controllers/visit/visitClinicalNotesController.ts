@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import VisitClinicalNote from "../../models/Visit/VisitClinicalNote";
 import mongoose from "mongoose";
 
-import { handleError } from "../../utils/handleError";
-
 // Get all clinicalNotes
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const clinicalNotes = await VisitClinicalNote.find({}).populate([
       {
         path: "medicalProvider_id",
@@ -14,35 +13,34 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       },
     ]);
     res.status(200).json(clinicalNotes);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single clinicalNote
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const clinicalNote = await VisitClinicalNote.findById(
-      req.params.id
+      req.params.id,
     ).populate([
       {
         path: "medicalProvider_id",
         select: "first_name last_name salutation _id",
       },
     ]);
-    if (!clinicalNote)
-      res.status(404).json({ message: "VisitClinicalNote not found" });
+    if (!clinicalNote) {
+      res.status(404);
+      throw new Error("VisitClinicalNote not found");
+    }
     res.status(200).json(clinicalNote);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a clinicalNote
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const { visit_id, medicalProvider_id, content, assessment, plan } = req.body;
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const { visit_id, medicalProvider_id, content, assessment, plan } =
+      req.body;
 
-  try {
     const newVisitClinicalNote = new VisitClinicalNote({
       visit_id,
       medicalProvider_id,
@@ -54,18 +52,18 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedVisitClinicalNote = await newVisitClinicalNote.save();
 
     res.status(201).json(savedVisitClinicalNote);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update clinicalNote
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const { visit_id, medicalProvider_id, content, assessment, plan } =
       req.body;
@@ -89,50 +87,45 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       payload,
       {
         new: true,
-      }
+      },
     );
-    if (!updatedVisitClinicalNote)
-      res.status(404).json({ message: "VisitClinicalNote not found" });
+    if (!updatedVisitClinicalNote) {
+      res.status(404);
+      throw new Error("VisitClinicalNote not found");
+    }
 
     res.json(updatedVisitClinicalNote);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a clinicalNote
-export const deleteVisitClinicalNote = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteVisitClinicalNote = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
-    const deletedVisitClinicalNote = await VisitClinicalNote.findByIdAndDelete(
-      id
-    );
-    if (!deletedVisitClinicalNote)
-      res.status(404).json({ message: "VisitClinicalNote not found" });
+    const deletedVisitClinicalNote =
+      await VisitClinicalNote.findByIdAndDelete(id);
+    if (!deletedVisitClinicalNote) {
+      res.status(404);
+      throw new Error("VisitClinicalNote not found");
+    }
 
     res.json({ message: "VisitClinicalNote deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a visit's clinical notes
-export const getClinicalNotesByVisit = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getClinicalNotesByVisit = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const diagnoses = await VisitClinicalNote.find(
       {
         visit_id: req.params.visitId,
       },
-      "assessment plan content medicalProvider_id createdAt"
+      "assessment plan content medicalProvider_id createdAt",
     )
       .populate([
         {
@@ -144,7 +137,5 @@ export const getClinicalNotesByVisit = async (
       .lean();
 
     res.status(200).json(diagnoses);
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

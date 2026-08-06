@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Policy from "../../models/Insurance/Policy";
-import { handleError } from "../../utils/handleError";
-
 import {
   generateMemberIdHashed,
   generatePolicyNumber,
 } from "../../utils/generator-functions";
 
 // Get all policies
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const policies = await Policy.find({}).populate([
       {
         path: "patientId",
@@ -27,14 +26,12 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       },
     ]);
     res.status(200).json(policies);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single policy
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const policy = await Policy.findById(req.params.id).populate([
       {
         path: "patientId",
@@ -50,27 +47,29 @@ export const single = async (req: Request, res: Response): Promise<void> => {
         },
       },
     ]);
-    if (!policy) res.status(404).json({ message: "Policy not found" });
+    if (!policy) {
+      res.status(404);
+      throw new Error("Policy not found");
+    }
     res.status(200).json(policy);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    patientId,
-    benefitPlanId,
-    coverageType,
-    effectiveDate,
-    expiryDate,
-    isActive,
-  } = req.body;
-  // Create a unique policy number:
-  const policyNumber = generatePolicyNumber();
+  },
+);
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      patientId,
+      benefitPlanId,
+      coverageType,
+      effectiveDate,
+      expiryDate,
+      isActive,
+    } = req.body;
+    // Create a unique policy number:
+    const policyNumber = generatePolicyNumber();
 
-  // Generate a hased member id:
-  const memberId = generateMemberIdHashed(patientId);
-  try {
+    // Generate a hased member id:
+    const memberId = generateMemberIdHashed(patientId);
+
     const newPolicy = new Policy({
       patientId,
       benefitPlanId,
@@ -85,16 +84,16 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedPolicy = await newPolicy.save();
 
     res.status(201).json(savedPolicy);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const {
       patientId,
@@ -125,29 +124,30 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       new: true,
     });
 
-    if (!updatedPolicy) res.status(404).json({ message: "Policy not found" });
+    if (!updatedPolicy) {
+      res.status(404);
+      throw new Error("Policy not found");
+    }
 
     res.json(updatedPolicy);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a policy
-export const deletePolicy = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deletePolicy = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedPolicy = await Policy.findByIdAndDelete(id);
-    if (!deletedPolicy) res.status(404).json({ message: "Policy not found" });
+    if (!deletedPolicy) {
+      res.status(404);
+      throw new Error("Policy not found");
+    }
 
     res.json({ message: "Policy deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

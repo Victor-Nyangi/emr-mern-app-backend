@@ -10,7 +10,8 @@ export const notFound = (req: Request, res: Response, next: NextFunction) => {
 /**
  * The single place errors become responses.
  *
- * Without this, controllers that did `res.status(404); throw ...` fell
+ * Controllers are wrapped in expressAsyncHandler and simply throw; this
+ * decides the status and the body. Without it, a thrown error fell
  * through to Express's default handler, which replies with an HTML error
  * page. The frontend calls response.json() on every reply, so that HTML
  * threw a SyntaxError which its catch turned into an empty result set --

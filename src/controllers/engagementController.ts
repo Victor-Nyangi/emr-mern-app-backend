@@ -32,7 +32,7 @@ import { Response, Request } from "express";
 // Inbox callback https://account.africastalking.com/apps/sandbox/sms/inbox/callback
 export const receiveMessage = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const data = req.body;
@@ -41,7 +41,7 @@ export const receiveMessage = async (
         data.linkId
       } \n text - ${data.text} \n id - ${data.id} \n to ${data.to} \n date ${
         data.date
-      } from \n ${data.from}`
+      } from \n ${data.from}`,
     );
     res.sendStatus(200);
   } catch (ex) {
@@ -52,7 +52,7 @@ export const receiveMessage = async (
 // Inbox callback https://account.africastalking.com/apps/sandbox/sms/dlr/callback
 export const checkStatus = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const data = req.body;
