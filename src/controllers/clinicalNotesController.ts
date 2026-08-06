@@ -2,13 +2,7 @@ import { Request, Response } from "express";
 import ClinicalNote from "../models/Patient/ClinicalNote";
 import mongoose from "mongoose";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
+import { handleError } from "../utils/handleError";
 
 // Get all clinicalNotes
 export const getAll = async (req: Request, res: Response): Promise<void> => {

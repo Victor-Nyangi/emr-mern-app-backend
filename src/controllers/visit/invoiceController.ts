@@ -4,13 +4,7 @@ import Invoice from "../../models/Visit/Invoice";
 import { generateInvoiceNumber } from "../../utils/generator-functions";
 import mongoose from "mongoose";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
+import { handleError } from "../../utils/handleError";
 
 // Get all policies
 export const getAll = async (req: Request, res: Response): Promise<void> => {

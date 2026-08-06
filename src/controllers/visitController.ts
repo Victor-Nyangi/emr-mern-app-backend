@@ -3,13 +3,7 @@ import mongoose from "mongoose";
 import Visit from "../models/Visit/Visit";
 import Patient from "../models/Patient/Patient";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
+import { handleError } from "../utils/handleError";
 
 // Get all visits
 export const getAll = async (req: Request, res: Response): Promise<void> => {
