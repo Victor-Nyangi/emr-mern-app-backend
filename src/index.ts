@@ -28,6 +28,7 @@ import v1NotificationRoutes from "./routes/api/notification-api";
 import v1EmrAiRoutes from "./routes/api/emrAi-api";
 
 import homeRoutes from "./routes/home";
+import { authLimiter } from "./middleware/rateLimiters";
 import "./models/Role";
 
 // lab_information,
@@ -49,7 +50,7 @@ app.use("/api/v1/services", v1ServiceRoutes);
 app.use("/api/v1/departments", v1DepartmentRoutes);
 app.use("/api/v1/billings", v1BillingRoutes);
 app.use("/api/v1/vitals", v1VitalRoutes);
-app.use("/api/v1/auth", v1AuthRoutes);
+app.use("/api/v1/auth", authLimiter, v1AuthRoutes);
 app.use("/api/v1/drugs", v1DrugRoutes);
 app.use("/api/v1/medical-providers", v1MedicalProviderRoutes);
 app.use("/api/v1/queues", v1QueueRoutes);
