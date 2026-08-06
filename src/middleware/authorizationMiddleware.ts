@@ -24,48 +24,46 @@ export enum Action {
 export const requirePermission = (resource: ResourceType, action: Action) => {
   return expressAsyncHandler(
     async (req: Request | any, res: Response, next: NextFunction) => {
-      try {
-        // Get user from request (set by auth middleware)
-        const user = req.user;
+      // Get user from request (set by auth middleware)
+      const user = req.user;
 
-        if (!user) {
-          res.status(401);
-          throw new Error("User not authenticated");
-        }
-
-        // Get context from request body or query params
-        const context = {
-          department: req.body.department || req.query.department,
-          patientStatus: req.body.patientStatus || req.query.patientStatus,
-          visitType: req.body.visitType || req.query.visitType,
-          dataSensitivity:
-            req.body.dataSensitivity || req.query.dataSensitivity,
-          isEmergency: req.body.isEmergency || req.query.isEmergency === "true",
-          patientId:
-            req.body.patientId || req.query.patientId || req.params.patientId,
-          visitId: req.body.visitId || req.query.visitId || req.params.visitId,
-        };
-
-        // Check if user has permission
-        const hasPermission = await AuthorizationService.checkPermission({
-          userId: user._id,
-          resource,
-          action,
-          context,
-        });
-
-        if (!hasPermission) {
-          res.status(403);
-          throw new Error(
-            `Insufficient permissions. Required: ${action} on ${resource}`
-          );
-        }
-
-        next();
-      } catch (error) {
-        res.status(403);
-        throw new Error("Access denied");
+      if (!user) {
+        res.status(401);
+        throw new Error("User not authenticated");
       }
+
+      // Get context from request body or query params
+      const context = {
+        department: req.body.department || req.query.department,
+        patientStatus: req.body.patientStatus || req.query.patientStatus,
+        visitType: req.body.visitType || req.query.visitType,
+        dataSensitivity: req.body.dataSensitivity || req.query.dataSensitivity,
+        isEmergency: req.body.isEmergency || req.query.isEmergency === "true",
+        patientId:
+          req.body.patientId || req.query.patientId || req.params.patientId,
+        visitId: req.body.visitId || req.query.visitId || req.params.visitId,
+      };
+
+      // Deliberately not wrapped in try/catch. An unexpected failure here
+      // -- a dropped database connection, a malformed role document --
+      // must propagate as a 500 rather than being flattened into "Access
+      // denied", which made outages indistinguishable from real denials
+      // in the one place where that distinction matters most.
+      const hasPermission = await AuthorizationService.checkPermission({
+        userId: user._id,
+        resource,
+        action,
+        context,
+      });
+
+      if (!hasPermission) {
+        res.status(403);
+        throw new Error(
+          `Insufficient permissions. Required: ${action} on ${resource}`
+        );
+      }
+
+      next();
     }
   );
 };
@@ -176,28 +174,24 @@ export const requireClinicalNotesDelete = requirePermission(
 // Admin-only middleware
 export const requireAdmin = expressAsyncHandler(
   async (req: Request | any, res: Response, next: NextFunction) => {
-    try {
-      const user = req.user;
+    const user = req.user;
 
-      if (!user) {
-        res.status(401);
-        throw new Error("User not authenticated");
-      }
-
-      // Get user permissions to check if they're admin
-      const userPermissions = await AuthorizationService.getUserPermissions(
-        user._id
-      );
-      if (!userPermissions || userPermissions.role.name !== "admin") {
-        res.status(403);
-        throw new Error("Admin access required");
-      }
-
-      next();
-    } catch (error) {
-      res.status(403);
-      throw new Error("Access denied");
+    if (!user) {
+      res.status(401);
+      throw new Error("User not authenticated");
     }
+
+    // Get user permissions to check if they're admin
+    const userPermissions = await AuthorizationService.getUserPermissions(
+      user._id
+    );
+
+    if (!userPermissions || userPermissions.role.name !== "admin") {
+      res.status(403);
+      throw new Error("Admin access required");
+    }
+
+    next();
   }
 );
 
@@ -205,27 +199,22 @@ export const requireAdmin = expressAsyncHandler(
 export const requireDepartmentAccess = (requiredDepartment: string) => {
   return expressAsyncHandler(
     async (req: Request | any, res: Response, next: NextFunction) => {
-      try {
-        const user = req.user;
+      const user = req.user;
 
-        if (!user) {
-          res.status(401);
-          throw new Error("User not authenticated");
-        }
-
-        // Check if user's department matches required department
-        if (user.department !== requiredDepartment) {
-          res.status(403);
-          throw new Error(
-            `Access denied. Required department: ${requiredDepartment}`
-          );
-        }
-
-        next();
-      } catch (error) {
-        res.status(403);
-        throw new Error("Access denied");
+      if (!user) {
+        res.status(401);
+        throw new Error("User not authenticated");
       }
+
+      // Check if user's department matches required department
+      if (user.department !== requiredDepartment) {
+        res.status(403);
+        throw new Error(
+          `Access denied. Required department: ${requiredDepartment}`
+        );
+      }
+
+      next();
     }
   );
 };
