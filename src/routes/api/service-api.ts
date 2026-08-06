@@ -7,6 +7,8 @@ import {
 } from "../../controllers/serviceController";
 import { Router } from "express";
 import { protect } from "../../middleware/authMiddleware";
+import { validate } from "../../middleware/validate";
+import { createServiceSchema, updateServiceSchema } from "../../schemas";
 import {
   requireBillingRead,
   requireBillingWrite,
@@ -23,13 +25,18 @@ router.use(protect);
 router.get("/", requireBillingRead, getAll);
 
 // Create a new service
-router.post("/", requireBillingCreate, create);
+router.post("/", requireBillingCreate, validate(createServiceSchema), create);
 
 // Retrieve a single service with id
 router.get("/:id", requireBillingRead, single);
 
 // Update a service with id
-router.patch("/:id", requireBillingWrite, update);
+router.patch(
+  "/:id",
+  requireBillingWrite,
+  validate(updateServiceSchema),
+  update,
+);
 
 // Delete a service with id
 router.delete("/:id", requireBillingDelete, deleteService);

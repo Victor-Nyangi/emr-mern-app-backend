@@ -36,6 +36,10 @@ router.patch("/:id", requireBillingWrite, update);
 router.delete("/:id", requireBillingDelete, deleteBenefitPlan);
 
 // Get policies for a specific benefit Plan
-router.get("/:benefitPlanId/policies", requireBillingRead, getPoliciesByBenefitPlan);
+router.get(
+  "/:benefitPlanId/policies",
+  requireBillingRead,
+  getPoliciesByBenefitPlan,
+);
 
 export default router;

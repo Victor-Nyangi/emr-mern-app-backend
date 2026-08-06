@@ -10,7 +10,7 @@ description : {
 },
 charge : {
     type: Number,
-    requried: true
+    required: true
 },
 main_purpose : {
     type: String,
