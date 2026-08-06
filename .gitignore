@@ -4,5 +4,15 @@
 /node_modules
 node_modules
 node_modules/
+
+# secrets — never commit connection strings or keys
 .env
+.env.*
+!.env.example
+config/default.json
+src/config/default.json
+
+# build output
+dist/
+
 package-lock.json
