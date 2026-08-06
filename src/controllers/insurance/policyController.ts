@@ -1,18 +1,12 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Policy from "../../models/Insurance/Policy";
+import { handleError } from "../../utils/handleError";
+
 import {
   generateMemberIdHashed,
   generatePolicyNumber,
 } from "../../utils/generator-functions";
-
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
 
 // Get all policies
 export const getAll = async (req: Request, res: Response): Promise<void> => {

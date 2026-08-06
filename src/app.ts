@@ -9,6 +9,7 @@ import { typeDefs, resolvers } from "./graphql";
 import User from "./models/User";
 import jwt from "jsonwebtoken";
 import { registerRoutes } from "./routes";
+import { notFound, errorHandler } from "./middleware/errorMiddleware";
 import "./models/Role";
 
 export interface CreateAppOptions {
@@ -92,6 +93,11 @@ export const createApp = async (
   );
 
   registerRoutes(app);
+
+  // Ordering is load-bearing: these must come after every route so that
+  // unmatched paths and thrown errors reach them.
+  app.use(notFound);
+  app.use(errorHandler);
 
   return app;
 };

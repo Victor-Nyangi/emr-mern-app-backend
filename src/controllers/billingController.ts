@@ -2,13 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Billing from "../models/Billing";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
+import { handleError } from "../utils/handleError";
 
 // Get all billings
 export const getAll = async (req: Request, res: Response): Promise<void> => {
