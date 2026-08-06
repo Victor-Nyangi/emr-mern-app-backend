@@ -1,36 +1,34 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Drug from "../models/Drug";
 
-import { handleError } from "../utils/handleError";
-
 // Get all drugs
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const drugs = await Drug.find();
     res.status(200).json(drugs);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single drug
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const drug = await Drug.findById(req.params.id);
-    if (!drug) res.status(404).json({ message: "Drug not found" });
+    if (!drug) {
+      res.status(404);
+      throw new Error("Drug not found");
+    }
     res.status(200).json(drug);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a drug
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const { name, description, manufacter_date, expiry_date, updated_date } =
-    req.body;
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const { name, description, manufacter_date, expiry_date, updated_date } =
+      req.body;
 
-  try {
     const newDrug = new Drug({
       name,
       description,
@@ -42,18 +40,18 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedDrug = await newDrug.save();
 
     res.status(201).json(savedDrug);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update drug
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const { name, description, manufacter_date, expiry_date, updated_date } =
       req.body;
@@ -75,29 +73,30 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const updatedDrug = await Drug.findByIdAndUpdate(id, payload, {
       new: true,
     });
-    if (!updatedDrug) res.status(404).json({ message: "Drug not found" });
+    if (!updatedDrug) {
+      res.status(404);
+      throw new Error("Drug not found");
+    }
 
     res.json(updatedDrug);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a drug
-export const deleteDrug = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteDrug = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedDrug = await Drug.findByIdAndDelete(id);
-    if (!deletedDrug) res.status(404).json({ message: "Drug not found" });
+    if (!deletedDrug) {
+      res.status(404);
+      throw new Error("Drug not found");
+    }
 
     res.json({ message: "Drug deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

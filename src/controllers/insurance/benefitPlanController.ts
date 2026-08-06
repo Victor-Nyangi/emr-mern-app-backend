@@ -1,51 +1,48 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import BenefitPlan from "../../models/Insurance/BenefitPlan";
 import Policy from "../../models/Insurance/Policy";
 
-import { handleError } from "../../utils/handleError";
-
 // Get all benefit plans
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const benefit_plans = await BenefitPlan.find({}).populate(
       "insurerId",
-      "name _id"
+      "name _id",
     ); // Populate the 'insurerId' and select only the 'name' and id
     res.status(200).json(benefit_plans);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single benefit plan
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const benefit_plan = await BenefitPlan.findById(req.params.id).populate(
       "insurerId",
-      "name _id"
+      "name _id",
     );
-    if (!benefit_plan)
-      res.status(404).json({ message: "Benefit Plan not found" });
+    if (!benefit_plan) {
+      res.status(404);
+      throw new Error("Benefit Plan not found");
+    }
     res.status(200).json(benefit_plan);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    name,
-    insurerId,
-    description,
-    coverageType,
-    coverageDetails,
-    costSharing,
-    outOfPocketMax,
-    coveredServices,
-    exclusions,
-  } = req.body;
+  },
+);
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      name,
+      insurerId,
+      description,
+      coverageType,
+      coverageDetails,
+      costSharing,
+      outOfPocketMax,
+      coveredServices,
+      exclusions,
+    } = req.body;
 
-  try {
     const newBenefitPlan = new BenefitPlan({
       name,
       insurerId,
@@ -61,16 +58,16 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedBenefitPlan = await newBenefitPlan.save();
 
     res.status(201).json(savedBenefitPlan);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const {
       name,
@@ -108,44 +105,40 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       payload,
       {
         new: true,
-      }
+      },
     );
 
-    if (!updatedBenefitPlan)
-      res.status(404).json({ message: "Benefit Plan not found" });
+    if (!updatedBenefitPlan) {
+      res.status(404);
+      throw new Error("Benefit Plan not found");
+    }
 
     res.json(updatedBenefitPlan);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a benefit plan
-export const deleteBenefitPlan = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteBenefitPlan = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedBenefitPlan = await BenefitPlan.findByIdAndDelete(id);
-    if (!deletedBenefitPlan)
-      res.status(404).json({ message: "Benefit Plan not found" });
+    if (!deletedBenefitPlan) {
+      res.status(404);
+      throw new Error("Benefit Plan not found");
+    }
 
     res.json({ message: "Benefit Plan deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a benefit plan's policies
-export const getPoliciesByBenefitPlan = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getPoliciesByBenefitPlan = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const policies = await Policy.find({
       benefitPlanId: req.params.benefitPlanId,
     }).populate([
@@ -164,7 +157,5 @@ export const getPoliciesByBenefitPlan = async (
     ]);
 
     res.status(200).json(policies);
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

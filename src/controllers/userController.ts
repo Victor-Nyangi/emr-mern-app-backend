@@ -37,7 +37,7 @@ export const registerUser = expressAsyncHandler(
     if (!name || !email || !password || !role || !department || !employee_id) {
       res.status(400);
       throw new Error(
-        "Please add all fields: name, email, password, role, department, employee_id"
+        "Please add all fields: name, email, password, role, department, employee_id",
       );
     }
 
@@ -85,7 +85,7 @@ export const registerUser = expressAsyncHandler(
       res.status(400);
       throw new Error("Invalid user data");
     }
-  }
+  },
 );
 
 // @desc    Authenticate a user
@@ -96,13 +96,20 @@ export const loginUser = expressAsyncHandler(
     const { email, password } = req.body;
 
     // Check for user email
-    const user = await User.findOne({ email }).populate('role');
+    const user = await User.findOne({ email }).populate("role");
 
     if (user && (await bcrypt.compare(password, user.password))) {
       // Get user permissions
-      const userPermissions = await AuthorizationService.getUserPermissions(user._id.toString());
-      const allowedActions = await AuthorizationService.getUserAllowedActions(user._id.toString());
-      const departmentPermissions = await AuthorizationService.getDepartmentPermissions(user._id.toString());
+      const userPermissions = await AuthorizationService.getUserPermissions(
+        user._id.toString(),
+      );
+      const allowedActions = await AuthorizationService.getUserAllowedActions(
+        user._id.toString(),
+      );
+      const departmentPermissions =
+        await AuthorizationService.getDepartmentPermissions(
+          user._id.toString(),
+        );
 
       // Update last login
       await User.findByIdAndUpdate(user._id, { last_login: new Date() });
@@ -123,7 +130,7 @@ export const loginUser = expressAsyncHandler(
       res.status(400);
       throw new Error("Invalid credentials");
     }
-  }
+  },
 );
 
 // @desc    Get user data
@@ -132,5 +139,5 @@ export const loginUser = expressAsyncHandler(
 export const getMe = expressAsyncHandler(
   async (req: Request | any, res: Response) => {
     res.status(200).json(req.user);
-  }
+  },
 );

@@ -1,42 +1,41 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import BenefitPlan from "../../models/Insurance/BenefitPlan";
 import Insurer from "../../models/Insurance/Insurer";
 
-import { handleError } from "../../utils/handleError";
-
 // Get all insurers
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const insurers = await Insurer.find();
     res.status(200).json(insurers);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single insurer
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const insurerId = req.params.id;
     const insurer = await Insurer.findById(insurerId);
 
     const benefitPlans = await BenefitPlan.find(
       { insurerId },
-      "name description coverageType createdAt"
-    ).populate("insurerId", "name _id")
+      "name description coverageType createdAt",
+    )
+      .populate("insurerId", "name _id")
       .lean(); // Returns plain JS object instead of Mongoose doc
 
-    if (!insurer) res.status(404).json({ message: "Insurer not found" });
+    if (!insurer) {
+      res.status(404);
+      throw new Error("Insurer not found");
+    }
     res.status(200).json({ insurer: insurer, benefit_plans: benefitPlans });
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const { name, status, panel, payerId, contact, agent } = req.body;
+  },
+);
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const { name, status, panel, payerId, contact, agent } = req.body;
 
-  try {
     const newInsurer = new Insurer({
       name,
       status,
@@ -49,16 +48,16 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedInsurer = await newInsurer.save();
 
     res.status(201).json(savedInsurer);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const { name, status, panel, payerId, contact, agent } = req.body;
 
@@ -74,29 +73,30 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       new: true,
     });
 
-    if (!updatedInsurer) res.status(404).json({ message: "Insurer not found" });
+    if (!updatedInsurer) {
+      res.status(404);
+      throw new Error("Insurer not found");
+    }
 
     res.json(updatedInsurer);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a insurer
-export const deleteInsurer = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteInsurer = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedInsurer = await Insurer.findByIdAndDelete(id);
-    if (!deletedInsurer) res.status(404).json({ message: "Insurer not found" });
+    if (!deletedInsurer) {
+      res.status(404);
+      throw new Error("Insurer not found");
+    }
 
     res.json({ message: "Insurer deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
