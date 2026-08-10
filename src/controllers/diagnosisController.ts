@@ -71,12 +71,6 @@ export const update = expressAsyncHandler(
       notes,
     } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400);
       throw new Error(`No diagnosis with id: ${id}`);

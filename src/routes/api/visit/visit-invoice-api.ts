@@ -17,6 +17,8 @@ import {
   requireBillingDelete,
 } from "../../../middleware/authorizationMiddleware";
 
+import { validate } from "../../../middleware/validate";
+import { createInvoiceSchema, updateInvoiceSchema } from "../../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -26,13 +28,18 @@ router.use(protect);
 router.get("/", requireBillingRead, getAll);
 
 // Create a new invoice
-router.post("/", requireBillingCreate, create);
+router.post("/", requireBillingCreate, validate(createInvoiceSchema), create);
 
 // Retrieve a single invoice with id
 router.get("/:id", requireBillingRead, single);
 
 // Update a invoice with id
-router.patch("/:id", requireBillingWrite, update);
+router.patch(
+  "/:id",
+  requireBillingWrite,
+  validate(updateInvoiceSchema),
+  update,
+);
 
 // Delete a invoice with id
 router.delete("/:id", requireBillingDelete, deleteInvoice);

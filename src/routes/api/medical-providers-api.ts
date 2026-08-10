@@ -14,6 +14,11 @@ import {
   requireMedicalProviderDelete,
 } from "../../middleware/authorizationMiddleware";
 
+import { validate } from "../../middleware/validate";
+import {
+  createMedicalProviderSchema,
+  updateMedicalProviderSchema,
+} from "../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -23,13 +28,23 @@ router.use(protect);
 router.get("/", requireMedicalProviderRead, getAll);
 
 // Create a new medicalProvider
-router.post("/", requireMedicalProviderCreate, create);
+router.post(
+  "/",
+  requireMedicalProviderCreate,
+  validate(createMedicalProviderSchema),
+  create,
+);
 
 // Retrieve a single medicalProvider with id
 router.get("/:id", requireMedicalProviderRead, single);
 
 // Update a medicalProvider with id
-router.patch("/:id", requireMedicalProviderWrite, update);
+router.patch(
+  "/:id",
+  requireMedicalProviderWrite,
+  validate(updateMedicalProviderSchema),
+  update,
+);
 
 // Delete a medicalProvider with id
 router.delete("/:id", requireMedicalProviderDelete, deleteMedicalProvider);

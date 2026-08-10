@@ -16,6 +16,11 @@ import {
   requireClinicalNotesDelete,
 } from "../../../middleware/authorizationMiddleware";
 
+import { validate } from "../../../middleware/validate";
+import {
+  createVisitClinicalNoteSchema,
+  updateVisitClinicalNoteSchema,
+} from "../../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -25,13 +30,23 @@ router.use(protect);
 router.get("/", requireClinicalNotesRead, getAll);
 
 // Create a new clinicalNote
-router.post("/", requireClinicalNotesCreate, create);
+router.post(
+  "/",
+  requireClinicalNotesCreate,
+  validate(createVisitClinicalNoteSchema),
+  create,
+);
 
 // Retrieve a single clinicalNote with id
 router.get("/:id", requireClinicalNotesRead, single);
 
 // Update a clinicalNote with id
-router.patch("/:id", requireClinicalNotesWrite, update);
+router.patch(
+  "/:id",
+  requireClinicalNotesWrite,
+  validate(updateVisitClinicalNoteSchema),
+  update,
+);
 
 // Delete a clinicalNote with id
 router.delete("/:id", requireClinicalNotesDelete, deleteVisitClinicalNote);
