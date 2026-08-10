@@ -77,12 +77,6 @@ export const update = expressAsyncHandler(
     const { patient_id, isFollowUp, payment_method, currentQueue, status } =
       req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     const payload = {
       patient_id,
       payment_method,
@@ -119,11 +113,6 @@ export const transition = expressAsyncHandler(
 
     const { status, transition } = req.body;
 
-    if (!req.body || !status) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
     const visit = await Visit.findById(id);
     if (!visit) {
       res.status(404).json({ message: "Visit not found" });

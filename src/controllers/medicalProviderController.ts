@@ -87,12 +87,6 @@ export const update = expressAsyncHandler(
       updated_date,
     } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     const payload = {
       first_name,
       last_name,

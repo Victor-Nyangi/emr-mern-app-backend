@@ -49,12 +49,6 @@ export const update = expressAsyncHandler(
 
     const { name, type, description, updated_date } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     const payload = { name, type, description, updated_date, _id: id };
 
     const updatedDepartment = await Department.findByIdAndUpdate(id, payload, {

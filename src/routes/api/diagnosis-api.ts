@@ -16,6 +16,8 @@ import {
   requireClinicalNotesDelete,
 } from "../../middleware/authorizationMiddleware";
 
+import { validate } from "../../middleware/validate";
+import { createDiagnosisSchema, updateDiagnosisSchema } from "../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -25,13 +27,23 @@ router.use(protect);
 router.get("/", requireClinicalNotesRead, getAll);
 
 // Create a new diagnosis
-router.post("/", requireClinicalNotesCreate, create);
+router.post(
+  "/",
+  requireClinicalNotesCreate,
+  validate(createDiagnosisSchema),
+  create,
+);
 
 // Retrieve a single diagnosis with id
 router.get("/:id", requireClinicalNotesRead, single);
 
 // Update a diagnosis with id
-router.patch("/:id", requireClinicalNotesWrite, update);
+router.patch(
+  "/:id",
+  requireClinicalNotesWrite,
+  validate(updateDiagnosisSchema),
+  update,
+);
 
 // Delete a diagnosis with id
 router.delete("/:id", requireClinicalNotesDelete, deleteDiagnosis);

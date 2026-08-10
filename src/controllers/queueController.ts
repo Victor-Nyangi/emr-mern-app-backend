@@ -93,12 +93,6 @@ export const update = expressAsyncHandler(
       notes,
     } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     const payload = {
       departmentId,
       name,
