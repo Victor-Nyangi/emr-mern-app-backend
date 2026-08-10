@@ -52,12 +52,6 @@ export const update = expressAsyncHandler(
 
     const { testName, status, result, ordered_by } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400);
       throw new Error(`No test with id: ${id}`);

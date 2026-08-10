@@ -14,6 +14,8 @@ import {
   requireBillingDelete,
 } from "../../middleware/authorizationMiddleware";
 
+import { validate } from "../../middleware/validate";
+import { createFinancialSchema, updateFinancialSchema } from "../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -23,13 +25,18 @@ router.use(protect);
 router.get("/", requireBillingRead, getAll);
 
 // Create a new financial
-router.post("/", requireBillingCreate, create);
+router.post("/", requireBillingCreate, validate(createFinancialSchema), create);
 
 // Retrieve a single financial with id
 router.get("/:id", requireBillingRead, single);
 
 // Update a financial with id
-router.patch("/:id", requireBillingWrite, update);
+router.patch(
+  "/:id",
+  requireBillingWrite,
+  validate(updateFinancialSchema),
+  update,
+);
 
 // Delete a financial with id
 router.delete("/:id", requireBillingDelete, deleteFinancial);

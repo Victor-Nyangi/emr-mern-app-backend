@@ -14,6 +14,8 @@ import {
   requireBillingDelete,
 } from "../../../middleware/authorizationMiddleware";
 
+import { validate } from "../../../middleware/validate";
+import { createInsurerSchema, updateInsurerSchema } from "../../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -23,13 +25,18 @@ router.use(protect);
 router.get("/", requireBillingRead, getAll);
 
 // Create a new insurance firm
-router.post("/", requireBillingCreate, create);
+router.post("/", requireBillingCreate, validate(createInsurerSchema), create);
 
 // Retrieve a single insurance firm with id
 router.get("/:id", requireBillingRead, single);
 
 // Update a insurance firm with id
-router.patch("/:id", requireBillingWrite, update);
+router.patch(
+  "/:id",
+  requireBillingWrite,
+  validate(updateInsurerSchema),
+  update,
+);
 
 // Delete a insurance firm with id
 router.delete("/:id", requireBillingDelete, deleteInsurer);

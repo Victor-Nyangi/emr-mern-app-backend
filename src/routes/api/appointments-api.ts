@@ -14,6 +14,11 @@ import {
   requireAppointmentDelete,
 } from "../../middleware/authorizationMiddleware";
 
+import { validate } from "../../middleware/validate";
+import {
+  createAppointmentSchema,
+  updateAppointmentSchema,
+} from "../../schemas";
 const router = Router();
 
 // Apply authentication middleware to all routes
@@ -23,13 +28,23 @@ router.use(protect);
 router.get("/", requireAppointmentRead, getAll);
 
 // Create a new appointment
-router.post("/", requireAppointmentCreate, create);
+router.post(
+  "/",
+  requireAppointmentCreate,
+  validate(createAppointmentSchema),
+  create,
+);
 
 // Retrieve a single appointment with id
 router.get("/:id", requireAppointmentRead, single);
 
 // Update a appointment with id
-router.patch("/:id", requireAppointmentWrite, update);
+router.patch(
+  "/:id",
+  requireAppointmentWrite,
+  validate(updateAppointmentSchema),
+  update,
+);
 
 // Delete a appointment with id
 router.delete("/:id", requireAppointmentDelete, deleteAppointment);

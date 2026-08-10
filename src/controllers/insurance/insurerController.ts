@@ -61,12 +61,6 @@ export const update = expressAsyncHandler(
 
     const { name, status, panel, payerId, contact, agent } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
     const payload = { name, status, panel, payerId, contact, agent, _id: id };
 
     const updatedInsurer = await Insurer.findByIdAndUpdate(id, payload, {
