@@ -566,6 +566,18 @@ export const updatePolicySchema = toUpdate(
   }),
 );
 
+// --- notification -----------------------------------------------------
+
+export const createNotificationSchema = Joi.object({
+  message: Joi.string().trim().min(1).required(),
+  // Mirrors the enum on the Notification model. The model defaults to
+  // "info" as well, but declaring it here means the handler receives a
+  // type on every request instead of relying on a destructuring default.
+  type: Joi.string()
+    .valid("info", "success", "warning", "error")
+    .default("info"),
+});
+
 // --- shared route params ---------------------------------------------
 
 export const idParamSchema = Joi.object({
