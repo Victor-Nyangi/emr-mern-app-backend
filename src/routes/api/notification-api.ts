@@ -4,6 +4,9 @@ import User from "../../models/User";
 import { protect } from "../../middleware/authMiddleware";
 import expressAsyncHandler from "express-async-handler";
 
+import { validate } from "../../middleware/validate";
+import { createNotificationSchema, idParamSchema } from "../../schemas";
+
 const router = express.Router();
 
 // Get all notifications for the authenticated user
@@ -37,12 +40,11 @@ router.get(
 router.post(
   "/",
   protect,
+  validate(createNotificationSchema),
   expressAsyncHandler(async (req, res) => {
-    const { message, type = "info" } = req.body;
-    if (!message) {
-      res.status(400).json({ message: "Message is required" });
-      return;
-    }
+    // The schema guarantees a non-empty message and fills in the default
+    // type, so there is nothing left to check by hand here.
+    const { message, type } = req.body;
     const notification = await Notification.create({
       message,
       user: (req as any).user.id,
@@ -57,6 +59,10 @@ router.post(
 router.patch(
   "/:id/read",
   protect,
+  // Without this a non-ObjectId reaches findOneAndUpdate and comes back
+  // as a Mongoose CastError naming the internal `_id` field; validating
+  // the param rejects it here, before any query is issued.
+  validate(idParamSchema, "params"),
   expressAsyncHandler(async (req, res) => {
     const notification = await Notification.findOneAndUpdate(
       { _id: req.params.id, user: (req as any).user.id },
