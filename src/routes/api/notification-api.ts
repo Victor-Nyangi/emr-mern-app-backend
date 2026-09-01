@@ -1,6 +1,5 @@
 import express from "express";
 import Notification from "../../models/Notification";
-import User from "../../models/User";
 import { protect } from "../../middleware/authMiddleware";
 import expressAsyncHandler from "express-async-handler";
 
@@ -74,65 +73,6 @@ router.patch(
       return;
     }
     res.json(notification);
-  }),
-);
-
-// Test endpoint to create sample notifications
-router.post(
-  "/test",
-  expressAsyncHandler(async (req, res) => {
-    const users = await User.find().limit(3);
-    if (users.length === 0) {
-      res.status(400).json({ message: "No users found" });
-      return;
-    }
-    const sampleNotifications = [
-      {
-        message:
-          "Welcome to the EMR system! Your account has been successfully created.",
-        type: "success",
-        read: false,
-      },
-      {
-        message: "New patient appointment scheduled for tomorrow at 10:00 AM.",
-        type: "info",
-        read: false,
-      },
-      {
-        message: "System maintenance scheduled for tonight at 2:00 AM.",
-        type: "warning",
-        read: false,
-      },
-      {
-        message: "Lab results are now available for patient ID: 12345.",
-        type: "info",
-        read: true,
-      },
-      {
-        message: "Payment received for invoice #INV-2024-001.",
-        type: "success",
-        read: false,
-      },
-      {
-        message: "Critical alert: Patient vitals require immediate attention.",
-        type: "error",
-        read: false,
-      },
-    ];
-    const createdNotifications = [];
-    for (const user of users) {
-      for (const notificationData of sampleNotifications) {
-        const notification = await Notification.create({
-          ...notificationData,
-          user: user._id,
-        });
-        createdNotifications.push(notification);
-      }
-    }
-    res.json({
-      message: `Created ${createdNotifications.length} test notifications`,
-      notifications: createdNotifications,
-    });
   }),
 );
 
