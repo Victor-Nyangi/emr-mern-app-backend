@@ -15,15 +15,15 @@ const patientSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    requried: false,
+    required: false,
   },
   phone_number: {
     type: Number,
-    requried: true,
+    required: true,
   },
   email: {
     type: String,
-    requried: true,
+    required: true,
   },
   gender: {
     type: String,

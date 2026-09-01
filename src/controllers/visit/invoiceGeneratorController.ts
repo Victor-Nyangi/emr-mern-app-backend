@@ -28,7 +28,7 @@ logger.level = "debug";
 
 export const createInvoice = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     await createInvoiceSchema.validateAsync(req.body);

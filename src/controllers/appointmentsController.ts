@@ -1,18 +1,11 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Appointment from "../models/Patient/Appointment";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all appointments
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const appointments = await Appointment.find({}).populate([
       {
         path: "medicalProvider_id",
@@ -24,14 +17,12 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       },
     ]);
     res.status(200).json(appointments);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single appointment
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const appointment = await Appointment.findById(req.params.id).populate([
       {
         path: "medicalProvider_id",
@@ -42,39 +33,33 @@ export const single = async (req: Request, res: Response): Promise<void> => {
         select: "first_name last_name salutation _id",
       },
     ]);
-    if (!appointment)
-      res.status(404).json({ message: "Appointment not found" });
+    if (!appointment) {
+      res.status(404);
+      throw new Error("Appointment not found");
+    }
     res.status(200).json(appointment);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a new appointment
-export const create = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const newAppointment = new Appointment(req.body);
     const savedAppointment = await newAppointment.save();
     res.status(201).json(savedAppointment);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update a appointment
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const { patient_id, medicalProvider_id, status, type, date } = req.body;
-
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
 
     const payload = {
       patient_id,
@@ -90,33 +75,32 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       payload,
       {
         new: true,
-      }
+      },
     );
-    if (!updatedAppointment)
-      res.status(404).json({ message: "Appointment not found" });
+    if (!updatedAppointment) {
+      res.status(404);
+      throw new Error("Appointment not found");
+    }
 
     res.json(updatedAppointment);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a appointment
-export const deleteAppointment = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteAppointment = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedAppointment = await Appointment.findByIdAndDelete(id);
-    if (!deletedAppointment)
-      res.status(404).json({ message: "Appointment not found" });
+    if (!deletedAppointment) {
+      res.status(404);
+      throw new Error("Appointment not found");
+    }
 
     res.json({ message: "Appointment deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

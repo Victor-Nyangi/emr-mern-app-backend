@@ -5,3 +5,16 @@
 * [Send message (GET)](http://localhost:5000/api/v1/sms/deliveryreports)
 * [Receive message (POST)](http://localhost:5000/api/v1/sms/receivemessage)
 * [Check deliver status (POST)](http://localhost:5000/api/v1/sms/deliveryreports)
+
+
+## Authentication
+Attribute-Based Access Control (ABAC) system for your EMR application. Here's what has been created:
+
+### Implementation
+
+Role Model - Defines roles with detailed permissions including attributes like department, patient status, visit type, data sensitivity, and time restrictions
+Updated User Model - Now includes role, department, employee ID, and other fields
+Authorization Service - Core ABAC logic with context-aware permission checking
+Authorization Middleware - Route-level protection with predefined middleware for common operations
+Permission Data - Comprehensive role definitions for admin, doctor, nurse, receptionist, billing specialist, and lab technician
+Seeder Script - Creates roles and test users with different permission levels

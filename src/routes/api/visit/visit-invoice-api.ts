@@ -9,28 +9,45 @@ import {
 } from "../../../controllers/visit/invoiceController";
 
 import { Router } from "express";
+import { protect } from "../../../middleware/authMiddleware";
+import {
+  requireBillingRead,
+  requireBillingWrite,
+  requireBillingCreate,
+  requireBillingDelete,
+} from "../../../middleware/authorizationMiddleware";
 
+import { validate } from "../../../middleware/validate";
+import { createInvoiceSchema, updateInvoiceSchema } from "../../../schemas";
 const router = Router();
 
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all invoices
-router.get("/", getAll);
+router.get("/", requireBillingRead, getAll);
 
 // Create a new invoice
-router.post("/", create);
+router.post("/", requireBillingCreate, validate(createInvoiceSchema), create);
 
 // Retrieve a single invoice with id
-router.get("/:id", single);
+router.get("/:id", requireBillingRead, single);
 
 // Update a invoice with id
-router.patch("/:id", update);
+router.patch(
+  "/:id",
+  requireBillingWrite,
+  validate(updateInvoiceSchema),
+  update,
+);
 
 // Delete a invoice with id
-router.delete("/:id", deleteInvoice);
+router.delete("/:id", requireBillingDelete, deleteInvoice);
 
 // Fetch invoice by visit id
-router.get("/visit/:visitId", getInvoicesByVisit);
+router.get("/visit/:visitId", requireBillingRead, getInvoicesByVisit);
 
 // invoice items
-router.post("/invoice", createInvoice);
+router.post("/invoice", requireBillingCreate, createInvoice);
 
 export default router;

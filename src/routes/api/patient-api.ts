@@ -9,30 +9,56 @@ import {
   getClinicalNotesByPatient,
   getAppointmentsByPatient,
 } from "../../controllers/patientController";
+import { protect } from "../../middleware/authMiddleware";
+import { validate } from "../../middleware/validate";
+import { createPatientSchema, updatePatientSchema } from "../../schemas";
+import {
+  requirePatientRead,
+  requirePatientWrite,
+  requirePatientCreate,
+  requirePatientDelete,
+} from "../../middleware/authorizationMiddleware";
 
 const router = Router();
+
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all patients
-router.get("/", getAll);
+router.get("/", requirePatientRead, getAll);
 
 // Create a new patient
-router.post("/", create);
+router.post("/", requirePatientCreate, validate(createPatientSchema), create);
 
 // Retrieve a single patient with id
-router.get("/:id", single);
+router.get("/:id", requirePatientRead, single);
 
 // Update a patient with id
-router.patch("/:id", update);
+router.patch(
+  "/:id",
+  requirePatientWrite,
+  validate(updatePatientSchema),
+  update,
+);
 
 // Delete a patient with id
-router.delete("/:id", deletePatient);
+router.delete("/:id", requirePatientDelete, deletePatient);
 
 // Get policies for a specific patient
-router.get("/:patientId/policies", getPoliciesByPatient);
+router.get("/:patientId/policies", requirePatientRead, getPoliciesByPatient);
 
-// Get appoibtments for a specific patient
-router.get("/:patientId/appointments", getAppointmentsByPatient);
+// Get appointments for a specific patient
+router.get(
+  "/:patientId/appointments",
+  requirePatientRead,
+  getAppointmentsByPatient,
+);
 
 // Get clinical notes for a specific patient
-router.get("/:patientId/clinical-notes", getClinicalNotesByPatient);
+router.get(
+  "/:patientId/clinical-notes",
+  requirePatientRead,
+  getClinicalNotesByPatient,
+);
 
 export default router;

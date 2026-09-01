@@ -16,8 +16,9 @@ const billingSchema = new mongoose.Schema({
     default: 0,
   },
   insuranceProvider: {
-    type: String,
-    default: null,
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Insurer",
   },
   services_charged: {
     type: [String],

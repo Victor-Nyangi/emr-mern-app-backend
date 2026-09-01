@@ -6,21 +6,47 @@ import {
   deleteMedicalProvider,
 } from "../../controllers/medicalProviderController";
 import { Router } from "express";
+import { protect } from "../../middleware/authMiddleware";
+import {
+  requireMedicalProviderRead,
+  requireMedicalProviderWrite,
+  requireMedicalProviderCreate,
+  requireMedicalProviderDelete,
+} from "../../middleware/authorizationMiddleware";
 
+import { validate } from "../../middleware/validate";
+import {
+  createMedicalProviderSchema,
+  updateMedicalProviderSchema,
+} from "../../schemas";
 const router = Router();
+
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all medicalProviders
-router.get("/", getAll);
+router.get("/", requireMedicalProviderRead, getAll);
 
 // Create a new medicalProvider
-router.post("/", create);
+router.post(
+  "/",
+  requireMedicalProviderCreate,
+  validate(createMedicalProviderSchema),
+  create,
+);
 
 // Retrieve a single medicalProvider with id
-router.get("/:id", single);
+router.get("/:id", requireMedicalProviderRead, single);
 
 // Update a medicalProvider with id
-router.patch("/:id", update);
+router.patch(
+  "/:id",
+  requireMedicalProviderWrite,
+  validate(updateMedicalProviderSchema),
+  update,
+);
 
 // Delete a medicalProvider with id
-router.delete("/:id", deleteMedicalProvider);
+router.delete("/:id", requireMedicalProviderDelete, deleteMedicalProvider);
 
 export default router;
