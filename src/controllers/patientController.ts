@@ -1,43 +1,36 @@
 import { Request, Response } from "express";
-import mongoose from "mongoose";
+import expressAsyncHandler from "express-async-handler";
 import Patient from "../models/Patient/Patient";
 import Policy from "../models/Insurance/Policy";
 import Appointment from "../models/Patient/Appointment";
 import ClinicalNote from "../models/Patient/ClinicalNote";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all patients
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const patients = await Patient.find();
 
     res.status(200).json(patients);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single patient
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const patient = await Patient.findById(req.params.id);
-    if (!patient) res.status(404).json({ message: "Patient not found" });
+
+    if (!patient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+
     res.status(200).json(patient);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a patient
-export const create = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const {
       first_name,
       last_name,
@@ -75,69 +68,49 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedPatient = await newPatient.save();
 
     res.status(201).json(savedPatient);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update a patient
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).send(`No patient with id: ${id}`);
-
-    const data = req.body;
-
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
-
-    const payload = {
-      ...data,
-      _id: id,
-    };
-
-    const updatedPatient = await Patient.findByIdAndUpdate(id, payload, {
+    // _id is deliberately not taken from the body: spreading it in let a
+    // caller attempt to rewrite the document's identity.
+    const updatedPatient = await Patient.findByIdAndUpdate(id, req.body, {
       new: true,
+      runValidators: true,
     });
 
-    if (!updatedPatient) res.status(404).json({ message: "Patient not found" });
+    if (!updatedPatient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
 
     res.json(updatedPatient);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-// Update a patient
-export const deletePatient = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+// Delete a patient
+export const deletePatient = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
 
     const deletedPatient = await Patient.findByIdAndDelete(id);
-    if (!deletedPatient) res.status(404).json({ message: "Patient not found" });
+
+    if (!deletedPatient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
 
     res.json({ message: "Patient deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a patient's policies
-export const getPoliciesByPatient = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getPoliciesByPatient = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const policies = await Policy.find({
       patientId: req.params.patientId,
     }).populate([
@@ -156,17 +129,12 @@ export const getPoliciesByPatient = async (
     ]);
 
     res.status(200).json(policies);
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a patient's clinical Notes
-export const getClinicalNotesByPatient = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getClinicalNotesByPatient = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const notes = await ClinicalNote.find({
       patient_id: req.params.patientId,
     }).populate([
@@ -181,17 +149,12 @@ export const getClinicalNotesByPatient = async (
     ]);
 
     res.status(200).json(notes);
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a patient's appointments
-export const getAppointmentsByPatient = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getAppointmentsByPatient = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const appointments = await Appointment.find({
       patient_id: req.params.patientId,
     }).populate([
@@ -206,7 +169,5 @@ export const getAppointmentsByPatient = async (
     ]);
 
     res.status(200).json(appointments);
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

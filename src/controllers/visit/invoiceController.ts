@@ -1,53 +1,46 @@
 import { Request, Response } from "express";
 
+import expressAsyncHandler from "express-async-handler";
 import Invoice from "../../models/Visit/Invoice";
 import { generateInvoiceNumber } from "../../utils/generator-functions";
 import mongoose from "mongoose";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all policies
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const policies = await Invoice.find();
     res.status(200).json(policies);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single invoice
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const invoice = await Invoice.findById(req.params.id);
-    if (!invoice) res.status(404).json({ message: "Invoice not found" });
+    if (!invoice) {
+      res.status(404);
+      throw new Error("Invoice not found");
+    }
     res.status(200).json(invoice);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    visitId,
-    service_charged,
-    description,
-    payment_mode,
-    amount,
-    copayAmount,
-    status,
-    notes,
-  } = req.body;
-  // Create a unique invoice number:
-  const invoiceNumber = generateInvoiceNumber();
+  },
+);
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      visitId,
+      service_charged,
+      description,
+      payment_mode,
+      amount,
+      copayAmount,
+      status,
+      notes,
+    } = req.body;
+    // Create a unique invoice number:
+    const invoiceNumber = generateInvoiceNumber();
 
-  // Generate a hased member id:
-  try {
+    // Generate a hased member id:
+
     const newInvoice = new Invoice({
       visitId,
       service_charged,
@@ -63,16 +56,16 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedInvoice = await newInvoice.save();
 
     res.status(201).json(savedInvoice);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const {
       service_charged,
@@ -83,12 +76,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       status,
       notes,
     } = req.body;
-
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
 
     const payload = {
       service_charged,
@@ -105,44 +92,42 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       new: true,
     });
 
-    if (!updatedInvoice) res.status(404).json({ message: "Invoice not found" });
+    if (!updatedInvoice) {
+      res.status(404);
+      throw new Error("Invoice not found");
+    }
 
     res.json(updatedInvoice);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a invoice
-export const deleteInvoice = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteInvoice = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedInvoice = await Invoice.findByIdAndDelete(id);
-    if (!deletedInvoice) res.status(404).json({ message: "Invoice not found" });
+    if (!deletedInvoice) {
+      res.status(404);
+      throw new Error("Invoice not found");
+    }
 
     res.json({ message: "Invoice deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a visit's invoices
-export const getInvoicesByVisit = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getInvoicesByVisit = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const invoices = await Invoice.find(
       {
         visitId: req.params.visitId,
       },
-      "visitId service_charged description payment_mode amount copayAmount status notes invoiceNumber createdAt"
+      "visitId service_charged description payment_mode amount copayAmount status notes invoiceNumber createdAt",
     )
       .sort({ createdAt: -1 })
       .lean();
@@ -156,7 +141,7 @@ export const getInvoicesByVisit = async (
         }
         return acc;
       },
-      { totalAmount: 0, totalCopay: 0, totalUnpaid: 0 }
+      { totalAmount: 0, totalCopay: 0, totalUnpaid: 0 },
     );
 
     // Example return
@@ -164,7 +149,5 @@ export const getInvoicesByVisit = async (
       invoices,
       totals,
     });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

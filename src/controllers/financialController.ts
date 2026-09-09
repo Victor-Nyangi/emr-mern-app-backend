@@ -1,116 +1,106 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Financial from "../models/Financial";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all financials
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const financials = await Financial.find();
 
     res.status(200).json(financials);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single financial
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const financial = await Financial.findById(req.params.id);
-    if (!financial) res.status(404).json({ message: "Financial not found" });
+    if (!financial) {
+      res.status(404);
+      throw new Error("Financial not found");
+    }
     res.status(200).json(financial);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a financial
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    patient_name,
-    account_name,
-    account_number,
-    account_type,
-    updated_date,
-  } = req.body;
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      patient_name,
+      account_name,
+      account_number,
+      account_type,
+      updated_date,
+    } = req.body;
 
-  try {
-  const newFinancial = new Financial({
-    patient_name,
-    account_name,
-    account_number,
-    account_type,
-    updated_date,
-  });
+    const newFinancial = new Financial({
+      patient_name,
+      account_name,
+      account_number,
+      account_type,
+      updated_date,
+    });
 
-   const savedFinancial =  await newFinancial.save();
+    const savedFinancial = await newFinancial.save();
 
     res.status(201).json(savedFinancial);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update a financial
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).send(`No financial with id: ${id}`);
-  const {
-    patient_name,
-    account_name,
-    account_number,
-    account_type,
-    updated_date,
-  } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error(`No financial with id: ${id}`);
+    }
+    const {
+      patient_name,
+      account_name,
+      account_number,
+      account_type,
+      updated_date,
+    } = req.body;
 
-  if (!req.body) {
-    res.status(400).send({
-      message: "Please fill all required fields",
+    const payload = {
+      patient_name,
+      account_name,
+      account_number,
+      account_type,
+      updated_date,
+      _id: id,
+    };
+
+    const updatedFinancial = await Financial.findByIdAndUpdate(id, payload, {
+      new: true,
     });
-  }
-  const payload = {
-    patient_name,
-    account_name,
-    account_number,
-    account_type,
-    updated_date,
-    _id: id,
-  };
+    if (!updatedFinancial) {
+      res.status(404);
+      throw new Error("Financial not found");
+    }
 
-  const updatedFinancial = await Financial.findByIdAndUpdate(id, payload, { new: true });
-  if (!updatedFinancial) res.status(404).json({ message: "Financial not found" });
-
-  res.json(updatedFinancial);
-} catch (error) {
-  handleError(res, error, 400);
-}};
+    res.json(updatedFinancial);
+  },
+);
 
 // Delete a financial
-export const deleteFinancial = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteFinancial = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedFinancial = await Financial.findByIdAndDelete(id);
-    if (!deletedFinancial) res.status(404).json({ message: "Financial not found" });
+    if (!deletedFinancial) {
+      res.status(404);
+      throw new Error("Financial not found");
+    }
 
     res.json({ message: "Financial deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
-
+  },
+);

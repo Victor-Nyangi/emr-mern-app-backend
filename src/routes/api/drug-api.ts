@@ -7,20 +7,43 @@ import {
   update,
   deleteDrug,
 } from "../../controllers/drugController";
+import { protect } from "../../middleware/authMiddleware";
+import {
+  requireClinicalNotesRead,
+  requireClinicalNotesWrite,
+  requireClinicalNotesCreate,
+  requireClinicalNotesDelete,
+} from "../../middleware/authorizationMiddleware";
+import { validate } from "../../middleware/validate";
+import { createDrugSchema, updateDrugSchema } from "../../schemas";
 const router = Router();
+
+// Apply authentication middleware to all routes
+router.use(protect);
+
 // Retrieve all drugs
-router.get("/", getAll);
+router.get("/", requireClinicalNotesRead, getAll);
 
 // Create a new drug
-router.post("/", create);
+router.post(
+  "/",
+  requireClinicalNotesCreate,
+  validate(createDrugSchema),
+  create,
+);
 
 // Retrieve a single drug with id
-router.get("/:id", single);
+router.get("/:id", requireClinicalNotesRead, single);
 
 // Update a drug with id
-router.patch("/:id", update);
+router.patch(
+  "/:id",
+  requireClinicalNotesWrite,
+  validate(updateDrugSchema),
+  update,
+);
 
 // Delete a drug with id
-router.delete("/:id", deleteDrug);
+router.delete("/:id", requireClinicalNotesDelete, deleteDrug);
 
 export default router;

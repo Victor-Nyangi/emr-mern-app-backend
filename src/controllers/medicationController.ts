@@ -1,53 +1,45 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import Medication from "../models/Visit/Medication";
 import mongoose from "mongoose";
 import { VisitMedication } from "interfaces/Visit";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all medications
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const medications = await Medication.find();
     res.status(200).json(medications);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single medication
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const medication = await Medication.findById(req.params.id);
-    if (!medication) res.status(404).json({ message: "Medication not found" });
+    if (!medication) {
+      res.status(404);
+      throw new Error("Medication not found");
+    }
     res.status(200).json(medication);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
-export const create = async (req: Request, res: Response) => {
-  const {
-    medication,
-    visitId,
-    patientId,
-    dosage,
-    frequency,
-    startDate,
-    endDate,
-    status,
-    duration,
-    prescribedBy,
-    notes,
-  } = req.body;
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      medication,
+      visitId,
+      patientId,
+      dosage,
+      frequency,
+      startDate,
+      endDate,
+      status,
+      duration,
+      prescribedBy,
+      notes,
+    } = req.body;
 
-  try {
     const newMedication = new Medication({
       medication,
       visitId,
@@ -64,16 +56,16 @@ export const create = async (req: Request, res: Response) => {
 
     const savedMedication = await newMedication.save();
     res.status(201).json(savedMedication);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const {
       medication,
@@ -87,14 +79,10 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       notes,
     } = req.body;
 
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error(`No medication with id: ${id}`);
     }
-
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).send(`No medication with id: ${id}`);
 
     const payload = {
       medication,
@@ -112,69 +100,60 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const updatedMedication = await Medication.findByIdAndUpdate(id, payload, {
       new: true,
     });
-    if (!updatedMedication)
-      res.status(404).json({ message: "Medication not found" });
+    if (!updatedMedication) {
+      res.status(404);
+      throw new Error("Medication not found");
+    }
 
     res.json(updatedMedication);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a medication
-export const deleteMedication = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteMedication = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedMedication = await Medication.findByIdAndDelete(id);
-    if (!deletedMedication)
-      res.status(404).json({ message: "Medication not found" });
+    if (!deletedMedication) {
+      res.status(404);
+      throw new Error("Medication not found");
+    }
 
     res.json({ message: "Medication deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a visit's medications
-export const getMedicationsByPatient = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getMedicationsByPatient = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const medications = await Medication.find(
       {
         patientId: req.params.patientId,
       },
-      "dosage medication frequency startDate endDate status duration prescribedBy notes visitId"
+      "dosage medication frequency startDate endDate status duration prescribedBy notes visitId",
     )
       .sort({ createdAt: -1 })
       .lean();
 
     res.status(200).json(medications);
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);
 
 // Fetch a visit's medications
-export const getMedicationsByVisit = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const getMedicationsByVisit = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
 
     const medications: VisitMedication[] = await Medication.find(
       {
         visitId: req.params.visitId,
       },
-      "dosage medication frequency startDate endDate status duration prescribedBy notes patientId createdAt"
+      "dosage medication frequency startDate endDate status duration prescribedBy notes patientId createdAt",
     )
       .populate([
         {
@@ -200,7 +179,5 @@ export const getMedicationsByVisit = async (
       new_medications,
       current_medications,
     });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

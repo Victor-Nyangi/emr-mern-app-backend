@@ -1,32 +1,23 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Visit from "../models/Visit/Visit";
 import Patient from "../models/Patient/Patient";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all visits
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const visits = await Visit.find({})
       .populate("patient_id", "first_name last_name") // Populate patient_id and select only the 'name' field
       .populate("currentQueue", "name"); // Populate currentQueue and select only the 'name' field
 
     res.status(200).json(visits);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single visit
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const visit = await Visit.findById(req.params.id).populate([
       {
         path: "currentQueue",
@@ -45,16 +36,17 @@ export const single = async (req: Request, res: Response): Promise<void> => {
     ]);
     const patient = await Patient.findById(visit?.patient_id);
 
-    if (!visit) res.status(404).json({ message: "Visit not found" });
+    if (!visit) {
+      res.status(404);
+      throw new Error("Visit not found");
+    }
     res.status(200).json({ visit, patient });
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Create a visit
-export const create = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { patient_id, payment_method, currentQueue, isFollowUp } = req.body;
 
     const newVisit = new Visit({
@@ -69,27 +61,21 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedVisit = await newVisit.save();
 
     res.status(201).json(savedVisit);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Update a visit
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).send(`No visit with id: ${id}`);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error(`No visit with id: ${id}`);
+    }
 
     const { patient_id, isFollowUp, payment_method, currentQueue, status } =
       req.body;
-
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
 
     const payload = {
       patient_id,
@@ -106,32 +92,27 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       new: true,
     });
 
-    if (!updatedVisit) res.status(404).json({ message: "Visit not found" });
+    if (!updatedVisit) {
+      res.status(404);
+      throw new Error("Visit not found");
+    }
 
     res.json(updatedVisit);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Transition a visit
-export const transition = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const transition = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).send(`No visit with id: ${id}`);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error(`No visit with id: ${id}`);
+    }
 
     const { status, transition } = req.body;
 
-    if (!req.body || !status) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
     const visit = await Visit.findById(id);
     if (!visit) {
       res.status(404).json({ message: "Visit not found" });
@@ -166,21 +147,18 @@ export const transition = async (
     const updatedVisit = await visit.save();
 
     res.json(updatedVisit);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Cancel a visit
-export const cancelVisit = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const cancelVisit = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).send(`No visit with id: ${id}`);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error(`No visit with id: ${id}`);
+    }
 
     const payload = {
       status: "CANCELLED",
@@ -192,10 +170,11 @@ export const cancelVisit = async (
       new: true,
     });
 
-    if (!updatedVisit) res.status(404).json({ message: "Visit not found" });
+    if (!updatedVisit) {
+      res.status(404);
+      throw new Error("Visit not found");
+    }
 
     res.json(updatedVisit);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);

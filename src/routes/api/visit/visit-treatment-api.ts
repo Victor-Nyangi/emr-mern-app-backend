@@ -8,24 +8,46 @@ import {
 } from "../../../controllers/visit/treatmentController";
 
 import { Router } from "express";
+import { protect } from "../../../middleware/authMiddleware";
+import {
+  requireClinicalNotesRead,
+  requireClinicalNotesWrite,
+  requireClinicalNotesCreate,
+  requireClinicalNotesDelete,
+} from "../../../middleware/authorizationMiddleware";
 
+import { validate } from "../../../middleware/validate";
+import { createTreatmentSchema, updateTreatmentSchema } from "../../../schemas";
 const router = Router();
 
-// Retrieve all clinicalNotes
-router.get("/", getAll);
+// Apply authentication middleware to all routes
+router.use(protect);
 
-// Create a new clinicalNote
-router.post("/", create);
+// Retrieve all treatments
+router.get("/", requireClinicalNotesRead, getAll);
 
-// Retrieve a single clinicalNote with id
-router.get("/:id", single);
+// Create a new treatment
+router.post(
+  "/",
+  requireClinicalNotesCreate,
+  validate(createTreatmentSchema),
+  create,
+);
+
+// Retrieve a single treatment with id
+router.get("/:id", requireClinicalNotesRead, single);
 
 // Update a treatment with id
-router.patch("/:id", update);
+router.patch(
+  "/:id",
+  requireClinicalNotesWrite,
+  validate(updateTreatmentSchema),
+  update,
+);
 
-// Delete a clinicalNote with id
-router.delete("/:id", deleteTreatment);
+// Delete a treatment with id
+router.delete("/:id", requireClinicalNotesDelete, deleteTreatment);
 
 // Fetch treatment by visit id
-router.get("/visit/:visitId", getTreatmentsByVisit);
+router.get("/visit/:visitId", requireClinicalNotesRead, getTreatmentsByVisit);
 export default router;

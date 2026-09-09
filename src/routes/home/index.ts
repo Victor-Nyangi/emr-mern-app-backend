@@ -9,7 +9,6 @@ export const ping = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-
 router.get("/", ping);
 
 export default router;

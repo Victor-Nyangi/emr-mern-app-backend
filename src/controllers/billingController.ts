@@ -1,49 +1,42 @@
 import { Request, Response } from "express";
+import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Billing from "../models/Billing";
 
-// Centralized error handler
-const handleError = (res: Response, error: unknown, statusCode = 500) => {
-  console.error(error);
-  const message =
-    error instanceof Error ? error.message : "Internal Server Error";
-  res.status(statusCode).json({ message });
-};
-
 // Get all billings
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getAll = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const billings = await Billing.find();
     res.status(200).json(billings);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
 // Get a single billing
-export const single = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const single = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const billing = await Billing.findById(req.params.id);
-    if (!billing) res.status(404).json({ message: "Billing not found" });
+    if (!billing) {
+      res.status(404);
+      throw new Error("Billing not found");
+    }
     res.status(200).json(billing);
-  } catch (error) {
-    handleError(res, error, 404);
-  }
-};
+  },
+);
 
-export const create = async (req: Request, res: Response): Promise<void> => {
-  const {
-    patient_name,
-    visit_id,
-    services_charged,
-    diagnosis,
-    amount,
-    insuranceProvider,
-    notes,
-    date_created,
-    updated_date,
-  } = req.body;
-  try {
+export const create = expressAsyncHandler(
+  async (req: Request, res: Response) => {
+    const {
+      patient_name,
+      visit_id,
+      services_charged,
+      diagnosis,
+      amount,
+      insuranceProvider,
+      notes,
+      date_created,
+      updated_date,
+    } = req.body;
+
     const newBilling = new Billing({
       patient_name,
       visit_id,
@@ -59,16 +52,16 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const savedBilling = await newBilling.save();
 
     res.status(201).json(savedBilling);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const update = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const {
       patient_name,
@@ -81,12 +74,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       notes,
       updated_date,
     } = req.body;
-
-    if (!req.body) {
-      res.status(400).send({
-        message: "Please fill all required fields",
-      });
-    }
 
     const payload = {
       patient_name,
@@ -104,29 +91,30 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const updatedBilling = await Billing.findByIdAndUpdate(id, payload, {
       new: true,
     });
-    if (!updatedBilling) res.status(404).json({ message: "Billing not found" });
+    if (!updatedBilling) {
+      res.status(404);
+      throw new Error("Billing not found");
+    }
 
     res.json(updatedBilling);
-  } catch (error) {
-    handleError(res, error, 400);
-  }
-};
+  },
+);
 
 // Delete a billing
-export const deleteBilling = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
+export const deleteBilling = expressAsyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      res.status(404).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Invalid ID");
+    }
 
     const deletedBilling = await Billing.findByIdAndDelete(id);
-    if (!deletedBilling) res.status(404).json({ message: "Billing not found" });
+    if (!deletedBilling) {
+      res.status(404);
+      throw new Error("Billing not found");
+    }
 
     res.json({ message: "Billing deleted successfully" });
-  } catch (error) {
-    handleError(res, error, 500);
-  }
-};
+  },
+);

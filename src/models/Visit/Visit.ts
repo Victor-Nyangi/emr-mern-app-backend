@@ -35,8 +35,11 @@ const visitSchema = new mongoose.Schema(
     },
     transitions: [
       {
-        queue: { type: String }, // e.g., "Consultation"
-        prev_queue: { type: String }, // e.g., "Triage"
+        // These hold Queue ids, not queue names -- the transition form
+        // sends `currentQueue` and `visit.currentQueue._id`. Kept as
+        // String rather than ObjectId to avoid rewriting existing rows.
+        queue: { type: String },
+        prev_queue: { type: String },
         enteredAt: { type: Date, default: Date.now },
       },
     ],
@@ -44,7 +47,7 @@ const visitSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // adds createdAt and updatedAt
-  }
+  },
 );
 
 const Visit = mongoose.model("Visit", visitSchema);
