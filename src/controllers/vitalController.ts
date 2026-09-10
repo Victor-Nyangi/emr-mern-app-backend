@@ -2,6 +2,14 @@ import { Request, Response } from "express";
 import expressAsyncHandler from "express-async-handler";
 import mongoose from "mongoose";
 import Vital from "../models/Vital";
+import { vitalDefinitions } from "../data/vitalDefinitions";
+
+// Get the authoritative unit/reference-range table for vital signs
+export const getDefinitions = expressAsyncHandler(
+  async (_req: Request, res: Response) => {
+    res.status(200).json(vitalDefinitions);
+  },
+);
 
 // Get all vitals
 export const getAll = expressAsyncHandler(
