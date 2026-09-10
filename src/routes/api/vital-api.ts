@@ -6,6 +6,7 @@ import {
   update,
   getVitalsByPatient,
   getVitalsByVisit,
+  getDefinitions,
 } from "../../controllers/vitalController";
 import { Router } from "express";
 import { protect } from "../../middleware/authMiddleware";
@@ -22,6 +23,13 @@ const router = Router();
 
 // Apply authentication middleware to all routes
 router.use(protect);
+
+// Authoritative unit/reference-range table for vital signs. Static
+// reference data, not patient-specific -- any authenticated user (or
+// future service account) can read it, so it isn't gated behind the
+// clinical-notes ABAC permission the way patient vitals are below.
+// Registered before "/:id" so it isn't swallowed as an id param.
+router.get("/definitions", getDefinitions);
 
 // Retrieve all vitals
 router.get("/", requireClinicalNotesRead, getAll);
