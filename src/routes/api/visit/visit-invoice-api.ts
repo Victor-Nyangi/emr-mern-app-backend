@@ -1,4 +1,3 @@
-import { createInvoice } from "../../../controllers/visit/invoiceGeneratorController";
 import {
   create,
   single,
@@ -46,8 +45,5 @@ router.delete("/:id", requireBillingDelete, deleteInvoice);
 
 // Fetch invoice by visit id
 router.get("/visit/:visitId", requireBillingRead, getInvoicesByVisit);
-
-// invoice items
-router.post("/invoice", requireBillingCreate, createInvoice);
 
 export default router;
